@@ -1,5 +1,5 @@
 import './App.css'
-import { Route, Routes, Link } from 'react-router-dom';
+import { Route, Routes, Link ,useNavigate} from 'react-router-dom';
 import { useState } from 'react';
 function Navbar() {
   return (
@@ -132,14 +132,13 @@ function Footer() {
   )
 }
 function Login() {
-  const[loginError, setLoginError] = useState('');
-  const[loginSuccess, setLoginSuccess] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [loginSuccess, setLoginSuccess] = useState(false);
   function handleLogin(event) {
     event.preventDefault();
     const email = event.target.email.value;
     const password = event.target.password.value;
 
-    // Simulate login validation
     if (email === 'user@example.com' && password === 'password') {
       setLoginSuccess(true);
       setLoginError('');
@@ -172,7 +171,7 @@ function Login() {
             required
           />
 
-        
+
           <span className="show-password">
             Show password / Hide password
           </span>
@@ -197,13 +196,247 @@ function Login() {
 }
 
 function Signup() {
+  const [role, setRole] = useState('Senior');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [signupError, setSignupError] = useState('');
+  const [signupSuccess, setSignupSuccess] = useState(false);
+  const navigate = useNavigate();
+
+  function handleSignup(event) {
+    event.preventDefault();
+
+    if (!role) {
+      setSignupError('Please select your role.');
+      return;
+    }
+
+    if (password.length < 8 || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
+      setSignupError('Password must contain at least 8 characters, a letter, and a number.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setSignupError('Passwords do not match.');
+      return;
+    }
+
+    if (!agreeToTerms) {
+      setSignupError('You must agree to the Terms and Privacy Policy.');
+      return;
+    }
+
+    setSignupError('');
+    navigate('/check-email');
+  }
+
   return (
-    <div>
-      <h1>Sign Up</h1>
-      <p>Create your SilverNest account.</p>
-    </div>
+    <>
+      <Navbar />
+
+      <div className="signup-page">
+        <div className="signup-card">
+          <h2>Create your account</h2>
+          <p>Choose your role, then tell us a little about you.</p>
+          <form onSubmit={handleSignup}>
+
+          <div className="role-selector">
+            <label>
+              <input
+                type="radio"
+                name="role"
+                value="Senior"
+                checked={role === 'Senior'}
+                onChange={() => setRole('Senior')}
+              />
+              Senior
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                name="role"
+                value="Family Caregiver"
+                checked={role === 'Family Caregiver'}
+                onChange={() => setRole('Family Caregiver')}
+              />
+              Family Caregiver
+            </label>
+
+            <label>
+              <input
+                type="radio"
+                name="role"
+                value="Volunteer"
+                checked={role === 'Volunteer'}
+                onChange={() => setRole('Volunteer')}
+              />
+              Volunteer
+            </label>
+          </div>
+          <div className="signup-fields">
+            <div className="signup-row">
+              <div className="signup-field">
+                <label htmlFor="fullName">Full name</label>
+                <input
+                  type="text"
+                  id="fullName"
+                  placeholder="Your full name"
+                  required
+                />
+              </div>
+
+              <div className="signup-field">
+                <label htmlFor="phone">Phone number</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  placeholder="05X XXX XXXX"
+                  maxLength={10}
+                  pattern="05[0-9]{8}"
+                  title="Enter a 10-digit phone number starting with 05"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="signup-field">
+              <label htmlFor="signupEmail">Email</label>
+              <input
+                type="email"
+                id="signupEmail"
+                placeholder="name@example.com"
+                required
+              />
+            </div>
+          </div>
+          <div className="signup-row signup-passwords">
+            <div className="signup-field">
+              <label htmlFor="signupPassword">Password</label>
+
+              <div className="signup-password-wrapper">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="signupPassword"
+                  placeholder="Create a password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+            </div>
+
+
+            <div className="signup-field">
+              <label htmlFor="confirmPassword">Confirm password</label>
+
+              <div className="signup-password-wrapper">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  id="confirmPassword"
+                  placeholder="Re-enter your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p className="password-hint">
+            At least 8 characters, with a letter and a number.
+          </p>
+          <div className="signup-terms">
+            <label>
+              <input
+                type="checkbox"
+                checked={agreeToTerms}
+                onChange={(e) => setAgreeToTerms(e.target.checked)}
+              />
+              <span>I agree to the Terms and Privacy Policy</span>
+            </label>
+          </div>
+          {signupError && (<p className="signup-error">{signupError}</p>)}
+          {signupSuccess && (<p className="signup-success">Form validation successful!</p>)}
+          <button type="submit" className="create-account-btn">
+            Create Account
+          </button>
+          
+
+          <p className="signup-login-link">
+            Already have an account? <Link to="/login">Log In</Link>
+          </p>
+          </form>
+
+        </div>
+
+      </div>
+    </>
   )
 }
+function CheckEmail() {
+  return (
+    <>
+      <Navbar />
+
+      <div className="signup-page">
+        <div className="signup-card">
+          <h2>Check your email</h2>
+
+          <p>
+            We've sent you an activation link.
+            Please check your email to activate your account.
+          </p>
+          <Link to="/account-activated" className="activation-link">
+            Activate Demo Account
+          </Link>
+
+          <Link to="/signup">Back to Sign Up</Link>
+        </div>
+      </div>
+    </>
+  );
+}
+function AccountActivated() {
+  return (
+    <>
+      <Navbar />
+
+      <div className="signup-page">
+        <div className="signup-card">
+          <h2>Your account is active!</h2>
+
+          <p>
+            Your email has been verified successfully.
+            You can now log in to SilverNest.
+          </p>
+
+          <Link to="/login" className="create-account-btn">
+            Go to Log In
+          </Link>
+        </div>
+      </div>
+    </>
+  );
+}
+
 
 function HomePage() {
   return (
@@ -223,7 +456,8 @@ function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-
+      <Route path="/check-email" element={<CheckEmail />} />
+      <Route path="/account-activated" element={<AccountActivated />} />
     </Routes>
   )
 }
