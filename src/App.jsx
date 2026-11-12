@@ -1,5 +1,5 @@
 import './App.css'
-import { Route, Routes, Link ,useNavigate} from 'react-router-dom';
+import { Route, Routes, Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import MemberFeatures from './MemberFeatures.jsx';
 function Navbar() {
@@ -206,19 +206,54 @@ function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [signupError, setSignupError] = useState('');
-  const [signupSuccess, setSignupSuccess] = useState(false);
+  const [volunteerFile, setVolunteerFile] = useState(null);
+  const [fileError, setFileError] = useState('');
   const navigate = useNavigate();
 
-  function handleSignup(event) {
-    event.preventDefault();
+  function handleVolunteerFile(event) {
+    const file = event.target.files?.[0];
 
-    if (!role) {
-      setSignupError('Please select your role.');
+    setFileError('');
+    setVolunteerFile(null);
+
+    if (!file) return;
+
+    const allowedTypes = [
+      'application/pdf',
+      'image/jpeg',
+      'image/png'
+    ];
+
+    if (
+      !allowedTypes.includes(file.type) ||
+      !/\.(pdf|jpg|jpeg|png)$/i.test(file.name)
+    ) {
+      setFileError('Only PDF, JPG, or PNG files are allowed.');
+      event.target.value = '';
       return;
     }
 
-    if (password.length < 8 || !/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
-      setSignupError('Password must contain at least 8 characters, a letter, and a number.');
+    if (file.size > 5 * 1024 * 1024) {
+      setFileError('File size must not exceed 5 MB.');
+      event.target.value = '';
+      return;
+    }
+
+    setVolunteerFile(file);
+  }
+
+  function handleSignup(event) {
+    event.preventDefault();
+    setSignupError('');
+
+    if (
+      password.length < 8 ||
+      !/[A-Za-z]/.test(password) ||
+      !/[0-9]/.test(password)
+    ) {
+      setSignupError(
+        'Password must contain at least 8 characters, a letter, and a number.'
+      );
       return;
     }
 
@@ -227,13 +262,28 @@ function Signup() {
       return;
     }
 
-    if (!agreeToTerms) {
-      setSignupError('You must agree to the Terms and Privacy Policy.');
+    if (role === 'Volunteer' && !volunteerFile) {
+      setSignupError(
+        fileError || 'Please upload your ID or vetting document.'
+      );
       return;
     }
 
-    setSignupError('');
-    navigate('/check-email');
+    if (!agreeToTerms) {
+      setSignupError(
+        'You must agree to the Terms and Privacy Policy.'
+      );
+      return;
+    }
+
+    const email=document.getElementById('signupEmail').value.trim();
+    sessionStorage.setItem('silvernestSignup', JSON.stringify({ email, role }));
+    navigate('/check-email', {
+      state: {
+        role,
+        email: event.currentTarget.elements.signupEmail.value.trim()
+      }
+    });
   }
 
   return (
@@ -244,199 +294,339 @@ function Signup() {
         <div className="signup-card">
           <h2>Create your account</h2>
           <p>Choose your role, then tell us a little about you.</p>
+
           <form onSubmit={handleSignup}>
+            <div className="role-selector">
+              {['Senior', 'Family Caregiver', 'Volunteer'].map(
+                (option) => (
+                  <label key={option}>
+                    <input
+                      type="radio"
+                      name="role"
+                      value={option}
+                      checked={role === option}
+                      onChange={() => {
+                        setRole(option);
+                        setSignupError('');
+                        setFileError('');
+                      }}
+                    />
+                    {option}
+                  </label>
+                )
+              )}
+            </div>
 
-          <div className="role-selector">
-            <label>
-              <input
-                type="radio"
-                name="role"
-                value="Senior"
-                checked={role === 'Senior'}
-                onChange={() => setRole('Senior')}
-              />
-              Senior
-            </label>
+            <div className="signup-fields">
+              <div className="signup-row">
+                <div className="signup-field">
+                  <label htmlFor="fullName">Full name</label>
+                  <input
+                    type="text"
+                    id="fullName"
+                    name="fullName"
+                    placeholder="Your full name"
+                    minLength={2}
+                    required
+                  />
+                </div>
 
-            <label>
-              <input
-                type="radio"
-                name="role"
-                value="Family Caregiver"
-                checked={role === 'Family Caregiver'}
-                onChange={() => setRole('Family Caregiver')}
-              />
-              Family Caregiver
-            </label>
-
-            <label>
-              <input
-                type="radio"
-                name="role"
-                value="Volunteer"
-                checked={role === 'Volunteer'}
-                onChange={() => setRole('Volunteer')}
-              />
-              Volunteer
-            </label>
-          </div>
-          <div className="signup-fields">
-            <div className="signup-row">
-              <div className="signup-field">
-                <label htmlFor="fullName">Full name</label>
-                <input
-                  type="text"
-                  id="fullName"
-                  placeholder="Your full name"
-                  required
-                />
+                <div className="signup-field">
+                  <label htmlFor="phone">Phone number</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    placeholder="05X XXX XXXX"
+                    maxLength={10}
+                    pattern="05[0-9]{8}"
+                    title="Enter a 10-digit phone number starting with 05"
+                    required
+                  />
+                </div>
               </div>
 
               <div className="signup-field">
-                <label htmlFor="phone">Phone number</label>
+                <label htmlFor="signupEmail">Email</label>
                 <input
-                  type="tel"
-                  id="phone"
-                  placeholder="05X XXX XXXX"
-                  maxLength={10}
-                  pattern="05[0-9]{8}"
-                  title="Enter a 10-digit phone number starting with 05"
+                  type="email"
+                  id="signupEmail"
+                  name="signupEmail"
+                  placeholder="name@example.com"
                   required
                 />
               </div>
             </div>
 
-            <div className="signup-field">
-              <label htmlFor="signupEmail">Email</label>
-              <input
-                type="email"
-                id="signupEmail"
-                placeholder="name@example.com"
-                required
-              />
+            <div className="signup-row signup-passwords">
+              <div className="signup-field">
+                <label htmlFor="signupPassword">Password</label>
+
+                <div className="signup-password-wrapper">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="signupPassword"
+                    placeholder="Create a password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="signup-field">
+                <label htmlFor="confirmPassword">
+                  Confirm password
+                </label>
+
+                <div className="signup-password-wrapper">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    id="confirmPassword"
+                    placeholder="Re-enter your password"
+                    value={confirmPassword}
+                    onChange={(e) =>
+                      setConfirmPassword(e.target.value)
+                    }
+                    required
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowConfirmPassword(!showConfirmPassword)
+                    }
+                  >
+                    {showConfirmPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="signup-row signup-passwords">
-            <div className="signup-field">
-              <label htmlFor="signupPassword">Password</label>
 
-              <div className="signup-password-wrapper">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="signupPassword"
-                  placeholder="Create a password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+            <p className="password-hint">
+              At least 8 characters, with a letter and a number.
+            </p>
 
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+            {role === 'Volunteer' && (
+              <div className="volunteer-upload">
+                <label htmlFor="volunteerFile">
+                  ID / Vetting Information
+                </label>
+
+                <label
+                  htmlFor="volunteerFile"
+                  className="upload-box"
                 >
-                  {showPassword ? 'Hide' : 'Show'}
-                </button>
-              </div>
-            </div>
+                  <span>
+                    {volunteerFile
+                      ? volunteerFile.name
+                      : 'Upload ID or vetting document'}
+                  </span>
+                  <small>PDF, JPG or PNG, up to 5 MB</small>
+                </label>
 
-
-            <div className="signup-field">
-              <label htmlFor="confirmPassword">Confirm password</label>
-
-              <div className="signup-password-wrapper">
                 <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  id="confirmPassword"
-                  placeholder="Re-enter your password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
+                  id="volunteerFile"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="volunteer-file-input"
+                  onChange={handleVolunteerFile}
+                  aria-label="Upload ID or vetting document"
                 />
 
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? 'Hide' : 'Show'}
-                </button>
+                {fileError && (
+                  <p className="file-error" role="alert">
+                    {fileError}
+                  </p>
+                )}
+
+                <p className="volunteer-note">
+                  Volunteer accounts require admin approval
+                  before you can accept tasks.
+                </p>
               </div>
+            )}
+
+            <div className="signup-terms">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={agreeToTerms}
+                  onChange={(e) =>
+                    setAgreeToTerms(e.target.checked)
+                  }
+                />
+                <span>
+                  I agree to the Terms and Privacy Policy
+                </span>
+              </label>
             </div>
-          </div>
 
-          <p className="password-hint">
-            At least 8 characters, with a letter and a number.
-          </p>
-          <div className="signup-terms">
-            <label>
-              <input
-                type="checkbox"
-                checked={agreeToTerms}
-                onChange={(e) => setAgreeToTerms(e.target.checked)}
-              />
-              <span>I agree to the Terms and Privacy Policy</span>
-            </label>
-          </div>
-          {signupError && (<p className="signup-error">{signupError}</p>)}
-          {signupSuccess && (<p className="signup-success">Form validation successful!</p>)}
-          <button type="submit" className="create-account-btn">
-            Create Account
-          </button>
-          
+            {signupError && (
+              <p className="signup-error" role="alert">
+                {signupError}
+              </p>
+            )}
 
-          <p className="signup-login-link">
-            Already have an account? <Link to="/login">Log In</Link>
-          </p>
+            <button
+              type="submit"
+              className="create-account-btn"
+            >
+              Create Account
+            </button>
+
+            <p className="signup-login-link">
+              Already have an account?{' '}
+              <Link to="/login">Log In</Link>
+            </p>
           </form>
-
-        </div>
-
-      </div>
-    </>
-  )
-}
-function CheckEmail() {
-  return (
-    <>
-      <Navbar />
-
-      <div className="signup-page">
-        <div className="signup-card">
-          <h2>Check your email</h2>
-
-          <p>
-            We've sent you an activation link.
-            Please check your email to activate your account.
-          </p>
-          <Link to="/account-activated" className="activation-link">
-            Activate Demo Account
-          </Link>
-
-          <Link to="/signup">Back to Sign Up</Link>
         </div>
       </div>
     </>
   );
 }
-function AccountActivated() {
+
+function ActivationLayout({ icon, title, children }) {
   return (
     <>
       <Navbar />
-
-      <div className="signup-page">
-        <div className="signup-card">
-          <h2>Your account is active!</h2>
-
-          <p>
-            Your email has been verified successfully.
-            You can now log in to SilverNest.
-          </p>
-
-          <Link to="/login" className="create-account-btn">
-            Go to Log In
-          </Link>
-        </div>
-      </div>
+      <main className="signup-page activation-page">
+        <section className="signup-card activation-card">
+          <div className="activation-icon" aria-hidden="true">
+            {icon}
+          </div>
+          <h2>{title}</h2>
+          {children}
+        </section>
+      </main>
     </>
+  );
+}
+
+function CheckEmail() {
+  const navigate = useNavigate();
+  const signup = JSON.parse(sessionStorage.getItem('silvernestSignup') || '{}');
+  const email = signup.email || 'your email address';
+  const [message, setMessage] = useState('');
+
+  function resendEmail() {
+    setMessage('A new activation link has been simulated.');
+  }
+
+  function simulateActivation() {
+    navigate(
+      signup.role === 'Volunteer'
+        ? '/volunteer-pending'
+        : '/account-activated'
+    );
+  }
+
+  return (
+    <ActivationLayout
+      icon="✉"
+      title="Check your email to activate your account"
+    >
+      <p>
+        We sent an activation link to <strong>{email}</strong>.
+        Click the link to finish setting up your account.
+      </p>
+
+      <button
+        type="button"
+        className="activation-secondary-btn"
+        onClick={resendEmail}
+      >
+        Resend activation email
+      </button>
+
+      {message && <p className="activation-message">{message}</p>}
+
+      <button
+        type="button"
+        className="activation-demo-btn"
+        onClick={simulateActivation}
+      >
+        Simulate Email Activation
+      </button>
+
+      <Link to="/signup" className="activation-back">
+        Back to Sign Up
+      </Link>
+    </ActivationLayout>
+  );
+}
+
+function AccountActivated() {
+  return (
+    <ActivationLayout
+      icon="✓"
+      title="Your account is active"
+    >
+      <p>
+        Thanks for confirming your email. You can now log in
+        to SilverNest.
+      </p>
+
+      <Link to="/login" className="create-account-btn activation-primary-btn">
+        Log In
+      </Link>
+    </ActivationLayout>
+  );
+}
+
+function VolunteerPending() {
+  return (
+    <ActivationLayout
+      icon="◷"
+      title="Your profile is pending admin approval"
+    >
+      <p>
+        Thanks for submitting your details. We will review your
+        ID and vetting information. We will email you once you
+        are approved.
+      </p>
+
+      <Link to="/" className="create-account-btn activation-primary-btn">
+        Back to Home
+      </Link>
+    </ActivationLayout>
+  );
+}
+
+function ActivationExpired() {
+  const [message, setMessage] = useState('');
+
+  return (
+    <ActivationLayout
+      icon="!"
+      title="This activation link has expired"
+    >
+      <p>
+        For your security, activation links expire after 24 hours.
+        Request a new one below.
+      </p>
+
+      <button
+        type="button"
+        className="create-account-btn activation-primary-btn"
+        onClick={() => setMessage('A new activation link has been simulated.')}
+      >
+        Resend activation email
+      </button>
+
+      {message && <p className="activation-message">{message}</p>}
+
+      <Link to="/signup" className="activation-back">
+        Back to Sign Up
+      </Link>
+    </ActivationLayout>
   );
 }
 
@@ -463,6 +653,8 @@ function App() {
       <Route path="/account-activated" element={<AccountActivated />} />
       <Route path="/senior" element={<MemberFeatures />} />
       <Route path="/caregiver" element={<MemberFeatures />} />
+      <Route path="/volunteer-pending" element={<VolunteerPending />} />
+      <Route path="/activation-expired" element={<ActivationExpired />} />
 
     </Routes>
   )
