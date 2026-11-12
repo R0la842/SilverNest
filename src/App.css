@@ -554,7 +554,6 @@ box-sizing: border-box;
   font-size: 12px;
 }
 
-/* Activation flow */
 
 .activation-page {
 min-height: calc(100vh - 90px);
@@ -633,7 +632,7 @@ margin-top: 12px;
 .activation-back {
 display: inline-block;
 margin-top: 18px;
-color: #28277e;
+color: #5954a4;
 font-size: 13px;
 text-decoration: none;
 }
@@ -641,6 +640,203 @@ text-decoration: none;
 .activation-message {
 margin-top: 12px;
 color: #23764a;
+}
+.services-page {
+  max-width: 1100px;
+  margin: 45px auto 80px;
+  padding: 0 24px;
+}
+
+.services-page h1 {
+  color: #5954a4;
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+.services-page > p {
+  color: #555;
+  margin-bottom: 24px;
+}
+
+
+.services-search {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.services-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.services-search button,
+.services-empty button {
+  padding: 12px 24px;
+  background: #5954a4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+
+.services-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.services-filters button {
+  padding: 9px 20px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.services-filters button.active {
+  background: #5954a4;
+  color: white;
+  border-color: #211c63;
+}
+
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.service-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 9px;
+  background: white;
+}
+
+.service-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  background: #5954a4;
+  border-radius: 6px;
+}
+
+.service-info {
+  flex: 1;
+}
+
+.service-info h3 {
+  margin: 0 0 7px;
+  color: #5954a4;
+  font-size: 17px;
+}
+
+.service-info p {
+  margin: 0;
+  font-size: 13px;
+  color: #555;
+}
+
+.service-learn-btn {
+  padding: 9px 14px;
+  border: 1px solid #5954a4;
+  border-radius: 6px;
+  color: #5954a4;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.service-learn-btn:hover {
+  background: #5954a4;
+  color: white;
+}
+
+
+.services-empty {
+  padding: 45px 20px;
+  border: 1px solid #ddd;
+  border-radius: 9px;
+  text-align: center;
+}
+
+.services-empty .service-icon {
+  margin: 0 auto 15px;
+}
+
+.services-empty h3 {
+  color: #5954a4;
+}
+
+.services-empty p {
+  color: #555;
+}
+
+
+.recent-requests {
+  margin-top: 32px;
+}
+
+.recent-requests h2 {
+  color: #5954a4;
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.request-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.request-row a {
+  padding: 8px 12px;
+  background: #eee;
+  border-radius: 5px;
+  color: #333;
+  text-decoration: none;
+  text-align: center;
+}
+
+
+@media (max-width: 768px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .service-card {
+    flex-wrap: wrap;
+  }
+
+  .request-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .services-page {
+    margin-top: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .services-search {
+    flex-direction: column;
+  }
+
+  .request-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 480px) {

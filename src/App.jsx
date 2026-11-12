@@ -668,6 +668,161 @@ function ActivationExpired() {
     </ActivationLayout>
   );
 }
+const servicesData = [
+  {
+    id: "grocery",
+    title: "Grocery Pickup",
+    category: "Grocery",
+    description: "Groceries picked up and delivered."
+  },
+  {
+    id: "pharmacy",
+    title: "Pharmacy Pickup",
+    category: "Pharmacy",
+    description: "Collect your pharmacy essentials."
+  },
+  {
+    id: "chores",
+    title: "Light Household Chores",
+    category: "Chores",
+    description: "A hand with light tidying at home."
+  },
+  {
+    id: "walks",
+    title: "Accompanied Walks",
+    category: "Walks",
+    description: "Friendly company on a local walk."
+  }
+];
+
+function ServicesCatalog() {
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState("All");
+
+  const filteredServices = servicesData.filter((service) => {
+    const matchesCategory =
+      category === "All" || service.category === category;
+
+    const matchesSearch = service.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
+
+  function handleSearch(event) {
+    event.preventDefault();
+    setSearchQuery(searchInput.trim().slice(0, 50));
+  }
+
+  function clearFilters() {
+    setSearchInput("");
+    setSearchQuery("");
+    setCategory("All");
+  }
+
+  return (
+    <>
+      <Navbar />
+
+      <main className="services-page">
+        <h1>Our Services</h1>
+        <p>
+          Everyday, non-medical help from vetted volunteers
+          in your neighborhood.
+        </p>
+
+        
+        <form onSubmit={handleSearch} className="services-search">
+          <input
+            type="text"
+            placeholder="Search services (e.g., pharmacy)"
+            value={searchInput}
+            maxLength={50}
+            onChange={(event) =>
+              setSearchInput(event.target.value)
+            }
+          />
+          <button type="submit">Search</button>
+        </form>
+
+        {/* Category filters */}
+        <div className="services-filters">
+          {["All", "Grocery", "Pharmacy", "Chores", "Walks"].map(
+            (item) => (
+              <button
+                key={item}
+                type="button"
+                className={category === item ? "active" : ""}
+                onClick={() => setCategory(item)}
+              >
+                {item}
+              </button>
+            )
+          )}
+        </div>
+
+        {/* Service cards / No results */}
+        {filteredServices.length > 0 ? (
+          <div className="services-grid">
+            {filteredServices.map((service) => (
+              <div className="service-card" key={service.id}>
+                <div className="service-icon" />
+
+                <div className="service-info">
+                  <h3>{service.title}</h3>
+                  <p>{service.description}</p>
+                </div>
+
+                <Link
+                  to={`/services/${service.id}`}
+                  className="service-learn-btn"
+                >
+                  Learn more
+                </Link>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="services-empty">
+            <div className="service-icon" />
+            <h3>No results found</h3>
+            <p>
+              No services match "{searchQuery}".
+              Try another search or clear your filters.
+            </p>
+            <button type="button" onClick={clearFilters}>
+              Clear Filters
+            </button>
+          </div>
+        )}
+
+        {/* Recent requests */}
+        <section className="recent-requests">
+          <h2>Recent requests in your community</h2>
+
+          {[
+            ["Grocery Pickup", "Northside", "Today, 2–4 PM"],
+            ["Pharmacy Pickup", "Oak Park", "Tomorrow, 10 AM"],
+            ["Accompanied Walks", "Riverside", "Tomorrow, 3 PM"]
+          ].map(([name, area, time]) => (
+            <div className="request-row" key={name}>
+              <strong>{name}</strong>
+              <span>{area}</span>
+              <span>{time}</span>
+              <Link to="/signup?role=Volunteer">
+                Sign up to accept
+              </Link>
+            </div>
+          ))}
+        </section>
+      </main>
+
+      <Footer />
+    </>
+  );
+}
 
 
 function HomePage() {
@@ -696,6 +851,7 @@ function App() {
         <Route path="/caregiver" element={<MemberFeatures />} />
         <Route path="/volunteer-pending" element={<VolunteerPending />} />
         <Route path="/activation-expired" element={<ActivationExpired />} />
+        <Route path="/services" element={<ServicesCatalog />} />
 
 
       </Routes>
