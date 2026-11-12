@@ -1,5 +1,5 @@
 import './App.css'
-import { Route, Routes, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Route, Routes, Link, useNavigate, useLocation,useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import MemberFeatures from './MemberFeatures.jsx';
@@ -824,6 +824,182 @@ function ServicesCatalog() {
   );
 }
 
+const serviceDetailsData = {
+  grocery: {
+    title: "Grocery Pickup",
+    description:
+      "A vetted volunteer picks up your groceries and delivers them to your door.",
+    included: [
+      "Picking up your prepared grocery order",
+      "Delivery to your doorstep",
+      "A confirmation note when done"
+    ],
+    excluded: [
+      "Paying for groceries",
+      "Buying items without your prior approval",
+      "Heavy lifting or moving furniture"
+    ]
+  },
+
+  pharmacy: {
+    title: "Pharmacy Pickup",
+    description:
+      "A vetted volunteer collects your prescription from the pharmacy and brings it to your door.",
+    included: [
+      "Collecting prescriptions that are already prepared",
+      "Delivery to your doorstep",
+      "A confirmation note and photo when done"
+    ],
+    excluded: [
+      "Medical advice of any kind",
+      "Giving or administering medication",
+      "Buying anything without your prior approval"
+    ]
+  },
+
+  chores: {
+    title: "Light Household Chores",
+    description:
+      "A vetted volunteer helps with simple household tasks.",
+    included: [
+      "Light tidying and organizing",
+      "Simple household assistance",
+      "Confirmation when the task is completed"
+    ],
+    excluded: [
+      "Heavy lifting",
+      "Professional cleaning services",
+      "Repairs requiring specialized skills"
+    ]
+  },
+
+  walks: {
+    title: "Accompanied Walks",
+    description:
+      "A vetted volunteer provides friendly companionship during a local walk.",
+    included: [
+      "Companionship during a local walk",
+      "Walking at a comfortable pace",
+      "Confirmation when the walk is completed"
+    ],
+    excluded: [
+      "Medical supervision",
+      "Physical therapy",
+      "Emergency medical assistance"
+    ]
+  }
+};
+
+function ServiceDetails() {
+  const { id } = useParams();
+
+  const service = serviceDetailsData[id];
+
+  if (!service) {
+    return (
+      <>
+        <Navbar />
+        <main className="service-details-page">
+          <h1>Service not found</h1>
+          <Link to="/services">Back to Services</Link>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Navbar />
+
+      <main className="service-details-page">
+
+        {/* Breadcrumb */}
+        <div className="service-breadcrumb">
+          <Link to="/services">Services</Link>
+          <span> / {service.title}</span>
+        </div>
+
+        {/* Service introduction */}
+        <h1>{service.title}</h1>
+        <p className="service-details-description">
+          {service.description}
+        </p>
+
+        {/* Included and excluded */}
+        <div className="service-details-grid">
+
+          <div className="service-details-card">
+            <h3>What's included</h3>
+            <ul>
+              {service.included.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="service-details-card">
+            <h3>What's not included</h3>
+            <ul>
+              {service.excluded.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+
+        </div>
+
+        {/* How it works */}
+        <section className="service-details-steps">
+          <h2>How it works</h2>
+
+          <div className="service-steps-grid">
+            <div>
+              <span>1</span>
+              Create an account and post the request.
+            </div>
+
+            <div>
+              <span>2</span>
+              A vetted volunteer nearby accepts it.
+            </div>
+
+            <div>
+              <span>3</span>
+              Delivery is confirmed and family is notified.
+            </div>
+          </div>
+        </section>
+
+        {/* Action buttons */}
+        <div className="service-details-actions">
+          <Link
+            to="/signup"
+            className="service-request-btn"
+          >
+            Sign up to request this
+          </Link>
+
+          <Link
+            to="/services"
+            className="service-back-btn"
+          >
+            Back to Services
+          </Link>
+        </div>
+
+        <p className="service-details-note">
+          Volunteers are vetted and approved by an admin
+          before they can help.
+        </p>
+
+      </main>
+
+      <Footer />
+    </>
+  );
+}
+
 
 function HomePage() {
   return (
@@ -852,6 +1028,7 @@ function App() {
         <Route path="/volunteer-pending" element={<VolunteerPending />} />
         <Route path="/activation-expired" element={<ActivationExpired />} />
         <Route path="/services" element={<ServicesCatalog />} />
+        <Route path="/services/:id" element={<ServiceDetails />} />
 
 
       </Routes>
