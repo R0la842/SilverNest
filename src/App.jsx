@@ -696,6 +696,7 @@ function App() {
         <Route path="/caregiver" element={<MemberFeatures />} />
         <Route path="/volunteer-pending" element={<VolunteerPending />} />
         <Route path="/activation-expired" element={<ActivationExpired />} />
+        <Footer />
 
 
       </Routes>
