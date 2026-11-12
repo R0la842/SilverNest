@@ -295,6 +295,368 @@ font-size: 13px;
 margin-top: 5px;
 color: #b42318;
 }
+.signup-page {
+  min-height: calc(100vh - 90px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+  background-color: white;
+}
+
+.signup-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 25px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: white;
+}
+
+.signup-card h2 {
+  color: #24234f;
+  margin-bottom: 12px;
+}
+
+.signup-card p {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.role-selector {
+  display: flex;
+  gap: 10px;
+}
+
+.role-selector label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.role-selector label:has(input:checked) {
+  background-color: #5954a4;
+  color: white;
+  border-color: #5954a4;
+}
+.signup-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.signup-row {
+  display: flex;
+  gap: 12px;
+}
+
+.signup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.signup-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #24234f;
+}
+
+.signup-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+.signup-passwords {
+margin-top: 15px;
+}
+
+.signup-password-wrapper {
+display: flex;
+align-items: center;
+border: 1px solid #ddd;
+border-radius: 5px;
+}
+
+.signup-password-wrapper input {
+border: none;
+outline: none;
+flex: 1;
+min-width: 0;
+}
+
+.signup-password-wrapper button {
+border: none;
+background: transparent;
+color: #5954a4;
+cursor: pointer;
+padding: 8px;
+font-size: 12px;
+}
+
+.signup-card .password-hint {
+font-size: 12px;
+color: #666;
+margin-top: 6px;
+}
+.signup-terms {
+margin-top: 15px;
+}
+
+.signup-terms label {
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 12px;
+cursor: pointer;
+}
+
+.signup-terms input {
+width: 16px;
+height: 16px;
+accent-color: #5954a4;
+}
+.create-account-btn {
+width: 100%;
+padding: 12px;
+margin-top: 20px;
+background-color: #5954a4;
+color: white;
+border: none;
+border-radius: 6px;
+font-size: 14px;
+font-weight: 600;
+cursor: pointer;
+}
+
+.create-account-btn:hover {
+background-color: #48438d;
+}
+
+.signup-login-link {
+text-align: center;
+margin-top: 15px;
+font-size: 13px;
+}
+
+.signup-login-link a {
+color: #5954a4;
+}
+.signup-error {
+color: #b42318;
+background-color: #fff0f0;
+border: 1px solid #e5b5b5;
+border-radius: 6px;
+padding: 10px;
+font-size: 13px;
+}
+.signup-success {
+color: #237423; 
+background-color: #f0fff0;
+border: 1px solid #b5e5b5;
+border-radius: 6px;
+padding: 10px;
+font-size: 13px;
+}
+.activation-link {
+display: block;
+text-align: center;
+padding: 12px;
+margin: 20px 0;
+background-color: #5954a4;
+color: white;
+border-radius: 6px;
+text-decoration: none;
+}
+
+.signup-card a.create-account-btn {
+display: block;
+text-align: center;
+text-decoration: none;
+box-sizing: border-box;
+}
+
+
+.volunteer-upload {
+  margin-top: 16px;
+  margin-bottom: 14px;
+}
+
+.volunteer-upload > label:first-child {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1e2340;
+}
+
+.volunteer-upload .upload-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  min-height: 75px;
+  padding: 14px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 7px;
+  background: white;
+  cursor: pointer;
+  text-align: center;
+}
+
+.volunteer-upload .upload-box:hover {
+  border-color: #312e81;
+  background: #f8f7ff;
+}
+
+.volunteer-upload .upload-box span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e2340;
+  overflow-wrap: anywhere;
+}
+
+.volunteer-upload .upload-box small {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.volunteer-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.volunteer-note {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.file-error {
+  margin-top: 6px;
+  color: #dc2626;
+  font-size: 12px;
+}
+
+/* Activation flow */
+
+.activation-page {
+min-height: calc(100vh - 90px);
+display: flex;
+justify-content: center;
+align-items: flex-start;
+padding: 65px 20px;
+}
+
+.activation-card {
+width: 100%;
+max-width: 412px;
+padding: 32px 28px;
+text-align: center;
+}
+
+.activation-icon {
+width: 52px;
+height: 52px;
+border: 2px solid #24276e;
+border-radius: 50%;
+color: #24276e;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 29px;
+margin: 0 auto 20px;
+}
+
+.activation-card h2 {
+font-size: 22px;
+line-height: 1.35;
+color: #24276e;
+margin-bottom: 14px;
+}
+
+.activation-card p {
+font-size: 14px;
+line-height: 1.6;
+margin-bottom: 22px;
+}
+
+.activation-primary-btn,
+.activation-secondary-btn,
+.activation-demo-btn {
+display: block;
+width: 100%;
+box-sizing: border-box;
+text-align: center;
+border-radius: 6px;
+padding: 12px;
+font-size: 14px;
+cursor: pointer;
+text-decoration: none;
+}
+
+.activation-primary-btn {
+background: #28277e;
+color: white;
+border: none;
+}
+
+.activation-secondary-btn {
+background: white;
+border: 1px solid #28277e;
+color: #28277e;
+}
+
+.activation-demo-btn {
+background: #f1f2ff;
+border: 1px dashed #8b8cbb;
+color: #28277e;
+margin-top: 12px;
+}
+
+.activation-back {
+display: inline-block;
+margin-top: 18px;
+color: #28277e;
+font-size: 13px;
+text-decoration: none;
+}
+
+.activation-message {
+margin-top: 12px;
+color: #23764a;
+}
+
+@media (max-width: 480px) {
+.activation-page {
+padding: 30px 16px;
+}
+
+.activation-card {
+padding: 26px 20px;
+}
+}
+@media (max-width: 480px) {
+  .signup-row {
+    flex-direction: column;
+  }
+}
 @media(max-width: 768px) {
   .steps-container, .roles-container {
     flex-direction: column;
