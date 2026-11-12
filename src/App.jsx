@@ -1,5 +1,6 @@
 import './App.css'
-import { Route, Routes, Link, useNavigate } from 'react-router-dom';
+import { Route, Routes, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import MemberFeatures from './MemberFeatures.jsx';
 function Navbar() {
@@ -11,17 +12,21 @@ function Navbar() {
 
       <div className="nav-links">
         <Link to="/">Home</Link>
-        <Link to="/how-it-works">How It Works</Link>
+        <Link to="/#how-it-works">How It Works</Link>
         <Link to="/services">Services</Link>
-        <Link to="/volunteer">Volunteer</Link>
+        <Link to="/signup?role=Volunteer">Volunteer</Link>
       </div>
 
       <div className="nav-buttons">
-        <Link to="/login" className="login-btn">Log In</Link>
-        <Link to="/signup" className="signup-btn">Sign Up</Link>
+        <Link to="/login" className="login-btn">
+          Log In
+        </Link>
+        <Link to="/signup" className="signup-btn">
+          Sign Up
+        </Link>
       </div>
     </nav>
-  )
+  );
 }
 
 function IntroSection() {
@@ -39,14 +44,21 @@ function IntroSection() {
       </p>
 
       <div className="intro-buttons">
-        <button className="primary-btn">Get Started</button>
-        <button className="secondary-btn">
+        <Link to="/signup" className="primary-btn">
+          Get Started
+        </Link>
+
+        <Link
+          to="/signup?role=Volunteer"
+          className="secondary-btn"
+        >
           Become a Volunteer
-        </button>
+        </Link>
       </div>
     </section>
-  )
+  );
 }
+
 function HowItWorks() {
   return (
     <section className="how-it-works" id="how-it-works">
@@ -69,10 +81,31 @@ function HowItWorks() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
+/* =====================================================
+   SCROLL TO HOW IT WORKS FROM NAVBAR
+   ===================================================== */
 
+function ScrollToSection() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const sectionId = location.hash.substring(1);
+
+      requestAnimationFrame(() => {
+        document.getElementById(sectionId)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      });
+    }
+  }, [location.pathname, location.hash]);
+
+  return null;
+}
 
 function PlaceForEveryone() {
   return (
@@ -241,7 +274,13 @@ function Signup() {
 
     setVolunteerFile(file);
   }
-
+  const location = useLocation();
+  useEffect(() => {
+    const selectedRole = new URLSearchParams(location.search).get('role');
+    if (selectedRole) {
+      sessionStorage.setItem('silvernestSignup', JSON.stringify({ role: selectedRole }));
+    }
+  }, [location.search]);
   function handleSignup(event) {
     event.preventDefault();
     setSignupError('');
@@ -276,7 +315,7 @@ function Signup() {
       return;
     }
 
-    const email=document.getElementById('signupEmail').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
     sessionStorage.setItem('silvernestSignup', JSON.stringify({ email, role }));
     navigate('/check-email', {
       state: {
@@ -645,19 +684,23 @@ function HomePage() {
 }
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/check-email" element={<CheckEmail />} />
-      <Route path="/account-activated" element={<AccountActivated />} />
-      <Route path="/senior" element={<MemberFeatures />} />
-      <Route path="/caregiver" element={<MemberFeatures />} />
-      <Route path="/volunteer-pending" element={<VolunteerPending />} />
-      <Route path="/activation-expired" element={<ActivationExpired />} />
+    <>
+      <ScrollToSection />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/check-email" element={<CheckEmail />} />
+        <Route path="/account-activated" element={<AccountActivated />} />
+        <Route path="/senior" element={<MemberFeatures />} />
+        <Route path="/caregiver" element={<MemberFeatures />} />
+        <Route path="/volunteer-pending" element={<VolunteerPending />} />
+        <Route path="/activation-expired" element={<ActivationExpired />} />
 
-    </Routes>
-  )
+
+      </Routes>
+    </>
+  );
 }
 
 export default App
