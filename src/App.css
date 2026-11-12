@@ -642,7 +642,95 @@ text-decoration: none;
 margin-top: 12px;
 color: #23764a;
 }
+.footer {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 24px 5%;
+background-color: #f5f3ff;
+border-top: 1px solid #ddd6fe;
+gap: 20px;
+}
 
+.footer-left h3 {
+color: #5954a4;
+margin: 0 0 8px;
+}
+
+.footer-left p {
+font-size: 13px;
+color: #555;
+margin: 0;
+}
+
+.footer-links {
+display: flex;
+gap: 24px;
+flex-wrap: wrap;
+}
+
+.footer-links a {
+color: #5954a4;
+text-decoration: none;
+font-size: 14px;
+}
+
+.footer-links a:hover {
+text-decoration: underline;
+}
+.footer-page {
+max-width: 900px;
+width: 90%;
+margin: 60px auto;
+padding: 40px;
+min-height: 55vh;
+background-color: #faf9ff;
+border: 1px solid #e4e0f5;
+border-radius: 12px;
+}
+
+.footer-page h1 {
+color: #5954a4;
+font-size: 32px;
+margin-bottom: 24px;
+}
+
+.footer-page h2 {
+color: #5954a4;
+font-size: 21px;
+margin-top: 28px;
+margin-bottom: 12px;
+}
+
+.footer-page p {
+color: #444;
+font-size: 16px;
+line-height: 1.8;
+}
+
+@media (max-width: 768px) {
+.footer-page {
+width: 92%;
+padding: 24px;
+margin: 30px auto;
+}
+
+.footer-page h1 {
+font-size: 26px;
+}
+}
+
+@media (max-width: 768px) {
+.footer {
+flex-direction: column;
+text-align: center;
+}
+
+.footer-links {
+justify-content: center;
+gap: 14px;
+}
+}
 @media (max-width: 480px) {
 .activation-page {
 padding: 30px 16px;
