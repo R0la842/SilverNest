@@ -158,11 +158,11 @@ function Footer() {
       </div>
 
       <div className="footer-links">
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-        <a href="#safety">Safety</a>
-        <a href="#privacy">Privacy Policy</a>
-        <a href="#terms">Terms</a>
+       <Link to="/about">About</Link>
+        <Link to="/contact">Contact</Link>
+        <Link to="/safety">Safety</Link>
+        <Link to="/privacy">Privacy Policy</Link>
+        <Link to="/terms">Terms of Service</Link>
       </div>
     </footer>
   )
@@ -678,9 +678,129 @@ function HomePage() {
       <HowItWorks />
       <PlaceForEveryone />
       <Message />
-      <Footer />
     </>
   )
+}
+function About() {
+  return (
+    <div className="footer-page">
+      <h1>About SilverNest</h1>
+      <p>
+        SilverNest connects seniors and family caregivers with
+        vetted local volunteers for everyday non-medical
+        assistance and companionship.
+      </p>
+
+      <h2>Our Mission</h2>
+      <p>
+        To build a supportive community where seniors can
+        receive trusted help while staying independent.
+      </p>
+    </div>
+  );
+}
+
+function Contact() {
+  return (
+    <div className="footer-page">
+      <h1>Contact Us</h1>
+      <p>Have a question or need assistance?</p>
+
+      <h2>Get in Touch</h2>
+      <p>
+        Contact the SilverNest support team for help with
+        your account, volunteer registration, or assistance requests.
+      </p>
+
+      <p>Our team is here to support you.</p>
+    </div>
+  );
+}
+
+function Safety() {
+  return (
+    <div className="footer-page">
+      <h1>Safety at SilverNest</h1>
+      <p>Your safety and trust are our priorities.</p>
+
+      <h2>Volunteer Verification</h2>
+      <p>
+        Volunteers must complete a verification process
+        and receive administrator approval before helping seniors.
+      </p>
+
+      <h2>Non-Medical Assistance</h2>
+      <p>
+        SilverNest volunteers provide everyday assistance
+        and companionship, not medical treatment or emergency services.
+      </p>
+
+      <h2>Report a Concern</h2>
+      <p>
+        Users can report safety concerns for administrator review.
+      </p>
+    </div>
+  );
+}
+
+function PrivacyPolicy() {
+  return (
+    <div className="footer-page">
+      <h1>Privacy Policy</h1>
+      <p>
+        SilverNest is designed to respect the privacy
+        of seniors, caregivers, and volunteers.
+      </p>
+
+      <h2>Information We Collect</h2>
+      <p>
+        Account information, contact details, and assistance
+        request information may be used to support the platform.
+      </p>
+
+      <h2>How Information Is Used</h2>
+      <p>
+        Information supports account management,
+        volunteer matching, and communication between users.
+      </p>
+
+      <h2>Privacy and Security</h2>
+      <p>
+        Personal information should only be accessible
+        to authorized users for appropriate purposes.
+      </p>
+    </div>
+  );
+}
+
+function Terms() {
+  return (
+    <div className="footer-page">
+      <h1>Terms of Service</h1>
+      <p>
+        By using SilverNest, users agree to follow
+        the platform's community guidelines.
+      </p>
+
+      <h2>Acceptable Use</h2>
+      <p>
+        Users must provide accurate information
+        and treat other community members respectfully.
+      </p>
+
+      <h2>Volunteer Responsibilities</h2>
+      <p>
+        Volunteers must be approved before accepting requests
+        and must only perform permitted non-medical tasks.
+      </p>
+
+      <h2>Platform Responsibilities</h2>
+      <p>
+        SilverNest provides a platform for coordinating
+        community assistance and reporting concerns.
+      </p>
+    </div>
+  );
 }
 function App() {
   return (
@@ -696,10 +816,16 @@ function App() {
         <Route path="/caregiver" element={<MemberFeatures />} />
         <Route path="/volunteer-pending" element={<VolunteerPending />} />
         <Route path="/activation-expired" element={<ActivationExpired />} />
-        <Footer />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/safety" element={<Safety />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<Terms />} />
 
 
       </Routes>
+      <Footer />
+
     </>
   );
 }
