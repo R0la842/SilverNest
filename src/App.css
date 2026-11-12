@@ -171,6 +171,14 @@
   padding: 30px 20px;
   background-color: #ffffff;
 }
+.role-dashboard-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: #5954a4;
+  font-weight: 650;
+  font-size: 14px;
+}
+.role-dashboard-link:hover { text-decoration: underline; }
 
 .message p {
   font-size: 16px;

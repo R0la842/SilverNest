@@ -1,6 +1,7 @@
 import './App.css'
 import { Route, Routes, Link ,useNavigate} from 'react-router-dom';
 import { useState } from 'react';
+import MemberFeatures from './MemberFeatures.jsx';
 function Navbar() {
   return (
     <nav className="navbar">
@@ -85,6 +86,7 @@ function PlaceForEveryone() {
             Get a helping hand with errands, light
             household tasks, or a friendly visit.
           </p>
+          <Link to="/senior" className="role-dashboard-link">Open senior dashboard →</Link>
         </div>
 
         <div className="role-card">
@@ -93,6 +95,7 @@ function PlaceForEveryone() {
             Arrange non-medical support for a loved
             one and stay informed along the way.
           </p>
+          <Link to="/caregiver" className="role-dashboard-link">Open caregiver dashboard →</Link>
         </div>
 
         <div className="role-card">
@@ -458,6 +461,9 @@ function App() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/check-email" element={<CheckEmail />} />
       <Route path="/account-activated" element={<AccountActivated />} />
+      <Route path="/senior" element={<MemberFeatures />} />
+      <Route path="/caregiver" element={<MemberFeatures />} />
+
     </Routes>
   )
 }
