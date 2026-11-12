@@ -153,7 +153,9 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer-brand">
-        <h2>SilverNest</h2>
+        <Link to="/" className="footer-home">
+          <h2>SilverNest</h2>
+        </Link>
         <p>&copy; 2026 SilverNest. Neighbors helping neighbors.</p>
       </div>
 
