@@ -78,6 +78,15 @@ Family caregivers can view a linked senior’s requests and wellness check-in, c
 No additional API keys or environment variables are required for the current front-end prototype.
 Email activation and volunteer document submission are simulated front-end interactions and do not require external services.
 
+### Admin Demo
+
+Start the application using the steps above. From the landing page, click **Admin Demo** to open the admin dashboard.
+
+You can also go directly to `/admin` after the local address shown in the terminal, for example: `http://localhost:5173/admin`.
+
+Use the admin navigation menu to view user accounts, volunteers, requests, reported issues, statistics, and settings. This prototype uses sample data.
+
+
 ## Team Members and Roles
 
 - Rola Alshahrani – Landing Page, Sign Up, Login, Services, Service Details, and Footer Pages.
