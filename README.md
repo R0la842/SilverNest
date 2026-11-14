@@ -67,6 +67,12 @@ The application includes role-based dashboard interfaces for managing and monito
 
 Users can access About, Contact, Safety, Privacy Policy, and Terms of Service pages through the footer.
 
+### Senior and Caregiver Features
+
+Seniors can view their dashboard, create, edit, or cancel assistance requests, complete a daily wellness check-in, and review request activity and status. They can also view notifications, message their linked caregiver, and manage their profile and settings.
+
+Family caregivers can view a linked senior’s requests and wellness check-in, create assistance requests, and link or manage a senior from the Profile page. They can review volunteers who offer help and approve or reject them, view notifications, message the senior, and manage caregiver profile and settings.
+
 ## Additional Configuration
 
 No additional API keys or environment variables are required for the current front-end prototype.
