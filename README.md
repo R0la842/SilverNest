@@ -81,12 +81,21 @@ Volunteers can view their workspace dashboard with active tasks, approved servic
 No additional API keys or environment variables are required for the current front-end prototype.
 Email activation and volunteer document submission are simulated front-end interactions and do not require external services.
 
+### Admin Demo
+
+Start the application using the steps above. From the landing page, click **Admin Demo** to open the admin dashboard.
+
+You can also go directly to `/admin` after the local address shown in the terminal, for example: `http://localhost:5173/admin`.
+
+Use the admin navigation menu to view user accounts, volunteers, requests, reported issues, statistics, and settings. This prototype uses sample data.
+
+
 ## Team Members and Roles
 
 - Rola Alshahrani – Landing Page, Sign Up, Login, Services, Service Details, and Footer Pages.
 - Rimas Binotay – Senior and Caregiver Features, including dashboards, assistance requests, daily wellness check-ins, caregiver-senior linking, volunteer approvals and rejections, notifications, messaging, profile and settings pages, and responsive design.
-- Alanoud Hazazi – Volunteer Features, including the volunteer workspace dashboard, task browsing and claiming, active task lifecycle management, service hours and feedback tracking, safety alerts, notifications, and volunteer profile management.
-- Sidrah Sanaullah – 
+- Alanoud Hazazi – Volunteer dashboard, browse/search.filter tasks, task details, claim a task, view assigned tasks, enter completion notes, upload proof if needed, view service hours and feedback
+- Sidrah Sanaullah – Admin Dashboard, manage user accounts, verify volunteers, manage and monitor requests, review reported issues, monitor volunteer performance, view statistics, manage settings, and integrate the pages and shared navigation
 
 ## Project Status
 
