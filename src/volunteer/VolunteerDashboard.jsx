@@ -58,6 +58,13 @@ function VolunteerDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifPanel, setShowNotifPanel] = useState(false);
 
+  const [volunteerProfile, setVolunteerProfile] = useState({
+    ...volunteer,
+    phone: '050 123 4567',
+    emergencyContact: 'Sara Ahmed · 055 987 6543',
+  });
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+
   // Shared tasks & feedback state
   const [tasks, setTasks] = useState(initialTasks);
   const [feedback] = useState(initialFeedback);
@@ -241,21 +248,22 @@ function VolunteerDashboard() {
   const activeCount =
     requestedTasks.length + assignedTasks.length + inProgressTasks.length;
 
-  const navItems = [
-    { id: 'overview', label: 'Dashboard', icon: '⌂' },
-    { id: 'find', label: `Find Tasks (${availableTasks.length})`, icon: '⌕' },
-    { id: 'mytasks', label: `My Tasks (${activeCount})`, icon: '▤' },
-    { id: 'hours', label: 'Service Hours', icon: '◷' },
-    { id: 'notifications', label: 'Notifications', icon: '♧' },
-  ];
-
-  const tabTitles = {
-    overview: 'Dashboard',
-    find: 'Find Tasks',
-    mytasks: 'My Tasks',
-    hours: 'Service Hours',
-    notifications: 'Notifications',
-  };
+const navItems = [
+  { id: 'overview', label: 'Dashboard', icon: '⌂' },
+  { id: 'find', label: `Find Tasks (${availableTasks.length})`, icon: '⌕' },
+  { id: 'mytasks', label: `My Tasks (${activeCount})`, icon: '▤' },
+  { id: 'hours', label: 'Service Hours', icon: '◷' },
+  { id: 'notifications', label: 'Notifications', icon: '♧' },
+  { id: 'profile', label: 'Profile', icon: '◯' },
+];
+const tabTitles = {
+  overview: 'Dashboard',
+  find: 'Find Tasks',
+  mytasks: 'My Tasks',
+  hours: 'Service Hours',
+  notifications: 'Notifications',
+  profile: 'Profile',
+};
 
   const handleQuickSearch = (e) => {
     const val = e.target.value;
@@ -327,7 +335,7 @@ function VolunteerDashboard() {
               <button
                 type="button"
                 className="senior-profile"
-                onClick={() => setActiveTab('hours')}
+                onClick={() => setActiveTab('profile')}
               >
                 {volunteer.name} ⌄
               </button>
@@ -626,6 +634,131 @@ function VolunteerDashboard() {
                 )}
               </section>
             )}
+                        {/* NOTIFICATIONS TAB */}
+            {activeTab === 'notifications' && (
+              <section className="senior-box">
+                ...
+              </section>
+            )}
+
+{/* PROFILE TAB */}
+{activeTab === 'profile' && (
+  <section className="senior-box senior-profile-view">
+    <div className="senior-profile-summary">
+      <span className="settings-avatar">
+        {volunteerProfile.name.charAt(0).toUpperCase()}
+      </span>
+      <div>
+        <h2>{volunteerProfile.name}</h2>
+        <span>
+          Volunteer account · {volunteerProfile.neighborhood}, {volunteerProfile.city}
+        </span>
+      </div>
+      <span className="settings-role">Volunteer</span>
+    </div>
+
+    {!isEditingProfile ? (
+      <>
+        <h3>Contact information</h3>
+        <dl className="senior-profile-details">
+          <div>
+            <dt>Phone number</dt>
+            <dd>{volunteerProfile.phone}</dd>
+          </div>
+          <div>
+            <dt>Email address</dt>
+            <dd>{volunteerProfile.email}</dd>
+          </div>
+          <div>
+            <dt>Emergency contact</dt>
+            <dd>{volunteerProfile.emergencyContact}</dd>
+          </div>
+        </dl>
+
+        <div className="senior-profile-actions">
+          <button
+            type="button"
+            className="senior-profile-edit"
+            onClick={() => setIsEditingProfile(true)}
+          >
+            Edit personal information
+          </button>
+        </div>
+      </>
+    ) : (
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          setIsEditingProfile(false);
+          showToast('Personal information updated.');
+        }}
+      >
+        <h3>Edit personal information</h3>
+        <div className="settings-field-grid">
+          <label className="settings-field">
+            <strong>Full name</strong>
+            <input
+              type="text"
+              value={volunteerProfile.name}
+              onChange={(e) =>
+                setVolunteerProfile({ ...volunteerProfile, name: e.target.value })
+              }
+              required
+            />
+          </label>
+          <label className="settings-field">
+            <strong>Phone number</strong>
+            <input
+              type="tel"
+              value={volunteerProfile.phone}
+              onChange={(e) =>
+                setVolunteerProfile({ ...volunteerProfile, phone: e.target.value })
+              }
+              required
+            />
+          </label>
+          <label className="settings-field">
+            <strong>Email address</strong>
+            <input
+              type="email"
+              value={volunteerProfile.email}
+              onChange={(e) =>
+                setVolunteerProfile({ ...volunteerProfile, email: e.target.value })
+              }
+              required
+            />
+          </label>
+          <label className="settings-field">
+            <strong>Emergency contact</strong>
+            <input
+              type="text"
+              value={volunteerProfile.emergencyContact}
+              onChange={(e) =>
+                setVolunteerProfile({
+                  ...volunteerProfile,
+                  emergencyContact: e.target.value,
+                })
+              }
+              required
+            />
+          </label>
+        </div>
+        <div className="settings-actions">
+          <button type="submit" className="settings-save">
+            Save Changes
+          </button>
+          <button
+            type="button"
+            className="settings-cancel"
+            onClick={() => setIsEditingProfile(false)}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    )}
+  </section>
+)}
           </main>
         </div>
       </div>
