@@ -38,6 +38,43 @@ function ActivityChart() {
   );
 }
 
+function StatusDonut() {
+  const total = statusCounts.reduce((sum, s) => sum + s.value, 0);
+  let start = 0;
+  const parts = statusCounts.map((s) => {
+    const from = start;
+    start += (s.value / total) * 100;
+    return `${s.color} ${from}% ${start}%`;
+  });
+
+  return (
+    <section className="ad-card">
+      <h2>Request Status</h2>
+      <div className="ad-donut-wrap">
+        <div
+          className="ad-donut"
+          style={{ background: `conic-gradient(${parts.join(', ')})` }}
+          role="img"
+          aria-label="Request status breakdown"
+        >
+          <div className="ad-donut-hole">
+            <strong>{total}</strong>
+            <span>Requests</span>
+          </div>
+        </div>
+        <ul className="ad-legend">
+          {statusCounts.map((s) => (
+            <li key={s.label}>
+              <span className="ad-dot" style={{ background: s.color }} />
+              {s.label} <strong>{s.value}</strong>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState('All');
 
@@ -65,7 +102,6 @@ export default function AdminDashboard() {
           {<StatusDonut />}
         </div>}
 
-   
       </main>
     </AdminLayout>
   );
