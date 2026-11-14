@@ -6,6 +6,12 @@ import VolunteerDashboard from './volunteer/VolunteerDashboard.jsx';
 import MemberFeatures from './MemberFeatures.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import AdminUsers from './pages/admin/UserManagement.jsx';
+import AdminVolunteers from './pages/admin/Volunteers.jsx';
+import AdminRequests from './pages/admin/Requests.jsx';
+import AdminRequests from './pages/admin/Requests.jsx';
+import AdminIssues from './pages/admin/ReportedIssues.jsx';
+import AdminStatistics from './pages/admin/Statistics.jsx';
+import AdminSettings from './pages/admin/Settings.jsx';
 
 function Navbar() {
   return (
@@ -831,6 +837,12 @@ function App() {
         <Route path="/terms" element={<Terms />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/volunteers" element={<AdminVolunteers />} />
+        <Route path="/admin/requests" element={<AdminRequests />} />
+        <Route path="/admin/requests" element={<AdminRequests />} />
+        <Route path="/admin/issues" element={<AdminIssues />} />
+        <Route path="/admin/statistics" element={<AdminStatistics />} />
+        <Route path="/admin/settings" element={<AdminSettings />} />
 
 
       </Routes>
