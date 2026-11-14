@@ -2,6 +2,7 @@ import './App.css'
 import { Route, Routes, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useState } from 'react';
+import VolunteerDashboard from './volunteer/VolunteerDashboard.jsx';
 import MemberFeatures from './MemberFeatures.jsx';
 function Navbar() {
   return (
@@ -137,6 +138,7 @@ function PlaceForEveryone() {
             Offer your time for non-medical help and
             companionship in your neighborhood.
           </p>
+          <Link to="/volunteer" className="role-dashboard-link">Open volunteer dashboard →</Link>
         </div>
       </div>
     </section>
@@ -816,7 +818,7 @@ function App() {
         <Route path="/account-activated" element={<AccountActivated />} />
         <Route path="/senior" element={<MemberFeatures />} />
         <Route path="/caregiver" element={<MemberFeatures />} />
-        <Route path="/volunteer-pending" element={<VolunteerPending />} />
+        <Route path="/volunteer" element={<VolunteerDashboard />} />
         <Route path="/activation-expired" element={<ActivationExpired />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
