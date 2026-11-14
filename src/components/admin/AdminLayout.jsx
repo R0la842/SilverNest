@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useNavigate} from 'react-router-dom';
 import '../../pages/admin/admin.css';
 
 const links = [
@@ -14,6 +14,14 @@ const links = [
 
 export default function AdminLayout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const [search, setSearch] = useState('');
+
+  function handleSearch(event) {
+    event.preventDefault();
+    const term = search.trim().slice(0, 50);
+    navigate(term ? `/admin/requests?search=${encodeURIComponent(term)}` : '/admin/requests');
+  }
 
   return (
     <div className="ad-shell">
@@ -50,7 +58,17 @@ export default function AdminLayout({ children }) {
       
       <div className="ad-main">
         <header className="ad-topbar">
-          {/* search box goes here */}
+          {<form onSubmit={handleSearch} className="ad-search" role="search">
+            <label htmlFor="ad-search" className="ad-sr-only">Search requests</label>
+            <input
+              id="ad-search"
+              type="search"
+              maxLength={50}
+              placeholder="Search requests…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </form>}
 
           {/* bell goes here */}
 
