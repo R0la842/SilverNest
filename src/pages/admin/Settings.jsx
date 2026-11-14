@@ -2,14 +2,8 @@ import { useState } from "react";
 import { Switch, useToast } from "../../components/admin/ui.jsx";
 import AdminLayout from "../../components/admin/AdminLayout.jsx";
 
-const INITIAL_SETTINGS = {
-  categories: [
-    { name: "Grocery Shopping", on: true },
-    { name: "Pharmacy Pickup", on: true },
-    { name: "Light Household Chores", on: true },
-    { name: "Companionship Walk", on: true },
-    { name: "Gardening Help", on: true },
-  ],
+const START = {
+  categories: ["Grocery Shopping", "Pharmacy Pickup", "Light Household Chores", "Companionship Walk", "Gardening Help"].map((name) => ({ name, on: true })),
   notify: [
     { key: "requests", label: "New assistance requests", hint: "Notify me when a senior or caregiver requests help.", on: true },
     { key: "apps", label: "Volunteer applications", hint: "Alert me when an application needs verification.", on: true },
@@ -20,120 +14,65 @@ const INITIAL_SETTINGS = {
 };
 
 export default function Settings() {
-  const [settings, setSettings] = useState(INITIAL_SETTINGS);
-  const [draft, setDraft] = useState(INITIAL_SETTINGS);
-  const [newCatName, setNewCatName] = useState("");
+  const [saved, setSaved] = useState(START);
+  const [draft, setDraft] = useState(START);
+  const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [toast, say] = useToast();
+  const dirty = JSON.stringify(saved) !== JSON.stringify(draft);
 
-  const isDirty = JSON.stringify(settings) !== JSON.stringify(draft);
-
-  const toggleCategory = (name, on) => {
-    setDraft({
-      ...draft,
-      categories: draft.categories.map((c) => (c.name === name ? { ...c, on } : c)),
-    });
-  };
-
-  const removeCategory = (name) => {
-    setDraft({
-      ...draft,
-      categories: draft.categories.filter((c) => c.name !== name),
-    });
-  };
-
-  const toggleNotification = (key, on) => {
-    setDraft({
-      ...draft,
-      notify: draft.notify.map((n) => (n.key === key ? { ...n, on } : n)),
-    });
-  };
-
-  const addCategory = (e) => {
+  const toggleCat = (n, on) => setDraft((d) => ({ ...d, categories: d.categories.map((c) => (c.name === n ? { ...c, on } : c)) }));
+  const removeCat = (n) => setDraft((d) => ({ ...d, categories: d.categories.filter((c) => c.name !== n) }));
+  const toggleNote = (key, on) => setDraft((d) => ({ ...d, notify: d.notify.map((x) => (x.key === key ? { ...x, on } : x)) }));
+  const addCat = (e) => {
     e.preventDefault();
-    const name = newCatName.trim();
-    
-    if (!name) return setError("Enter a category name.");
-    if (draft.categories.some((c) => c.name.toLowerCase() === name.toLowerCase())) {
-      return setError("That category already exists.");
-    }
-
-    setDraft({
-      ...draft,
-      categories: [...draft.categories, { name, on: true }],
-    });
-    setNewCatName("");
-    setError("");
+    const n = name.trim();
+    if (!n) return setError("Enter a category name.");
+    if (draft.categories.some((c) => c.name.toLowerCase() === n.toLowerCase())) return setError("That category already exists.");
+    setDraft((d) => ({ ...d, categories: [...d.categories, { name: n, on: true }] }));
+    setName(""); setError("");
   };
-
-  const handleSave = () => {
-    setSettings(draft);
-    say("Settings saved successfully");
-  };
-
-  const handleCancel = () => {
-    setDraft(settings);
-    setError("");
-  };
+  const save = () => { setSaved(draft); say("Settings saved"); };
 
   return (
     <AdminLayout>
       <main className="ad-content">
         <div className="sn-page">
           <h1>Settings</h1>
-          
           <div className="sn-split">
             <section className="sn-card">
-              <h3>Assistance Request Categories</h3>
+              <h3>Assistance request categories</h3>
               <p className="sn-muted">Choose which kinds of help seniors can request.</p>
-              
               {draft.categories.map((c) => (
                 <div className="sn-setting" key={c.name}>
                   <span>{c.name}</span>
                   <span className="sn-row">
-                    <Switch checked={c.on} onChange={(v) => toggleCategory(c.name, v)} label={`Enable ${c.name}`} />
-                    <button className="sn-link" onClick={() => removeCategory(c.name)} aria-label={`Remove ${c.name}`}>Remove</button>
+                    <Switch checked={c.on} onChange={(v) => toggleCat(c.name, v)} label={`Enable ${c.name}`} />
+                    <button className="sn-link" onClick={() => removeCat(c.name)} aria-label={`Remove ${c.name}`}>Remove</button>
                   </span>
                 </div>
               ))}
-
-              <form className="sn-toolbar" onSubmit={addCategory} style={{ marginTop: 12 }}>
-                <input 
-                  className="sn-input" 
-                  placeholder="New category name" 
-                  aria-label="New category name" 
-                  value={newCatName} 
-                  onChange={(e) => { setNewCatName(e.target.value); setError(""); }} 
-                />
+              <form className="sn-toolbar" onSubmit={addCat} style={{ marginTop: 12 }}>
+                <input className="sn-input" placeholder="New category name" aria-label="New category name" value={name} onChange={(e) => { setName(e.target.value); setError(""); }} />
                 <button className="sn-btn ghost" type="submit">Add Category</button>
               </form>
-              
               {error && <p className="sn-muted" role="alert" style={{ color: "#b91c1c" }}>{error}</p>}
             </section>
-
             <section className="sn-card">
-              <h3>Notification Preferences</h3>
+              <h3>Notification preferences</h3>
               {draft.notify.map((n) => (
                 <div className="sn-setting" key={n.key}>
-                  <div>
-                    <strong>{n.label}</strong>
-                    <p>{n.hint}</p>
-                  </div>
-                  <Switch checked={n.on} onChange={(v) => toggleNotification(n.key, v)} label={n.label} />
+                  <div><strong>{n.label}</strong><p>{n.hint}</p></div>
+                  <Switch checked={n.on} onChange={(v) => toggleNote(n.key, v)} label={n.label} />
                 </div>
               ))}
             </section>
           </div>
-
-      
           <div className="sn-actions">
-            <p className="sn-muted" style={{ margin: "0 auto 0 0" }}>
-              {isDirty ? "You have unsaved changes." : "Your changes will apply after saving."}
-            </p>
-            <button className="sn-btn ghost" disabled={!isDirty} onClick={handleCancel}>Cancel</button>
-            <button className="sn-btn" disabled={!isDirty} onClick={handleSave}>Save Changes</button>
+            <p className="sn-muted" style={{ margin: "0 auto 0 0" }}>{dirty ? "You have unsaved changes." : "Your changes will apply after saving."}</p>
+            <button className="sn-btn ghost" disabled={!dirty} onClick={() => setDraft(saved)}>Cancel</button>
+            <button className="sn-btn" disabled={!dirty} onClick={save}>Save Changes</button>
           </div>
-
           {toast}
         </div>
       </main>
