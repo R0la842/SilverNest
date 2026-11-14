@@ -6,7 +6,7 @@ import VolunteerDashboard from './volunteer/VolunteerDashboard.jsx';
 import MemberFeatures from './MemberFeatures.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import AdminUsers from './pages/admin/UserManagement.jsx';
-import AdminVolunteers from './pages/admin/Volunteers (1).jsx';
+import AdminVolunteers from './pages/admin/Volunteers.jsx';
 import AdminRequests from './pages/admin/Requests.jsx';
 import AdminIssues from './pages/admin/ReportedIssues.jsx';
 import AdminStatistics from './pages/admin/Statistics.jsx';
