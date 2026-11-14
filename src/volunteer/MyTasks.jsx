@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { volunteer, TASK_STATUS } from "./volunteerData";
 import "./Volunteer.css";
 
@@ -7,13 +7,14 @@ export default function MyTasks({
   onStartTask,
   onCompleteTask,
 }) {
-  const [statusFilter, setStatusFilter] = useState("");
+  const [activeTab, setActiveTab] = useState("Upcoming");
   const [completionTaskId, setCompletionTaskId] = useState(null);
   const [notes, setNotes] = useState("");
   const [proofFile, setProofFile] = useState(null);
   const [busyTaskId, setBusyTaskId] = useState(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [modalError, setModalError] = useState("");
 
   const myTasks = tasks.filter(
     (task) =>
@@ -21,15 +22,50 @@ export default function MyTasks({
       task.status !== TASK_STATUS.AVAILABLE
   );
 
-  const visibleTasks = myTasks.filter(
-    (task) => !statusFilter || task.status === statusFilter
+  const tabs = ["Upcoming", "In Progress", "Completed"];
+  const activeCompletionTask = tasks.find(
+    (item) => item.id === completionTaskId
   );
 
-  const statuses = Object.values(TASK_STATUS).filter(
-    (status) => status !== TASK_STATUS.AVAILABLE
-  );
+  // Close modal with Escape key for keyboard accessibility
+  useEffect(() => {
+    if (!activeCompletionTask) return;
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape" && busyTaskId === null) {
+        setCompletionTaskId(null);
+        setNotes("");
+        setProofFile(null);
+        setModalError("");
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeCompletionTask, busyTaskId]);
+
+  function getTasksForTab(tab) {
+    if (tab === "Upcoming") {
+      return myTasks.filter(
+        (task) =>
+          task.status === TASK_STATUS.ASSIGNED ||
+          task.status === TASK_STATUS.REQUESTED
+      );
+    }
+    if (tab === "In Progress") {
+      return myTasks.filter((task) => task.status === TASK_STATUS.IN_PROGRESS);
+    }
+    return myTasks.filter(
+      (task) =>
+        task.status === TASK_STATUS.COMPLETED ||
+        task.status === TASK_STATUS.AWAITING_REVIEW
+    );
+  }
+
+  const visibleTasks = getTasksForTab(activeTab);
 
   async function handleStartTask(taskId) {
+    if (busyTaskId !== null) return;
     setMessage("");
     setError("");
 
@@ -67,43 +103,85 @@ export default function MyTasks({
     setProofFile(null);
     setMessage("");
     setError("");
+    setModalError("");
+  }
+
+  function closeCompletionForm() {
+    if (busyTaskId !== null) return;
+    setCompletionTaskId(null);
+    setNotes("");
+    setProofFile(null);
+    setModalError("");
+  }
+
+  function handleProofChange(event) {
+    const file = event.target.files?.[0] || null;
+
+    setModalError("");
+    setProofFile(null);
+
+    if (!file) return;
+
+    const acceptedTypes = ["image/jpeg", "image/png"];
+
+    if (!acceptedTypes.includes(file.type)) {
+      setModalError("Please select a JPG or PNG image.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setModalError("Image size must not exceed 5 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    setProofFile(file);
   }
 
   async function handleSubmitCompletion(event) {
     event.preventDefault();
-    setMessage("");
-    setError("");
+    if (busyTaskId !== null) return;
 
-    const task = tasks.find(
-      (item) => item.id === completionTaskId
-    );
+    setMessage("");
+    setModalError("");
+
+    const task = activeCompletionTask;
 
     if (
       !task ||
       task.volunteerId !== volunteer.id ||
       task.status !== TASK_STATUS.IN_PROGRESS
     ) {
-      setError("Only your in-progress tasks can be completed.");
+      setModalError("Only your in-progress tasks can be completed.");
       return;
     }
 
     if (!notes.trim()) {
-      setError("Please enter completion notes.");
+      setModalError("Please enter completion notes.");
       return;
     }
 
     if (task.proofRequired && !proofFile) {
-      setError("Please attach a completion photo.");
+      setModalError("Please attach a completion photo.");
       return;
     }
 
-    if (proofFile && !proofFile.type.startsWith("image/")) {
-      setError("Please select an image file.");
+    if (
+      proofFile &&
+      !["image/jpeg", "image/png"].includes(proofFile.type)
+    ) {
+      setModalError("Please select a JPG or PNG image.");
+      return;
+    }
+
+    if (proofFile && proofFile.size > 5 * 1024 * 1024) {
+      setModalError("Image size must not exceed 5 MB.");
       return;
     }
 
     if (typeof onCompleteTask !== "function") {
-      setError("The completion action is not connected yet.");
+      setModalError("The completion action is not connected yet.");
       return;
     }
 
@@ -122,7 +200,7 @@ export default function MyTasks({
         "Completion submitted! Service hours will be added after approval."
       );
     } catch {
-      setError("Could not submit completion. Please try again.");
+      setModalError("Could not submit completion. Please try again.");
     } finally {
       setBusyTaskId(null);
     }
@@ -137,28 +215,31 @@ export default function MyTasks({
         </div>
       </div>
 
-      <div className="volunteer-filters">
-        <label htmlFor="my-tasks-status">Filter by status</label>
-
-        <select
-          id="my-tasks-status"
-          className="vol-select"
-          value={statusFilter}
-          onChange={(event) => setStatusFilter(event.target.value)}
-        >
-          <option value="">All statuses</option>
-
-          {statuses.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
+      {/* Figma Tabs with Task Counters */}
+      <div className="settings-tabs" role="tablist" aria-label="Task status tabs">
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab}
+            className={activeTab === tab ? "active" : ""}
+            onClick={() => {
+              setActiveTab(tab);
+              setError("");
+              setMessage("");
+            }}
+          >
+            {tab} ({getTasksForTab(tab).length})
+          </button>
+        ))}
       </div>
 
-      <p role="status" className="vol-success-banner">
-        {message}
-      </p>
+      {message && (
+        <p role="status" className="vol-success-banner">
+          ✓ {message}
+        </p>
+      )}
 
       {error && (
         <p role="alert" className="file-error">
@@ -166,19 +247,20 @@ export default function MyTasks({
         </p>
       )}
 
-      <p className="sn-muted" aria-live="polite">
-        {visibleTasks.length} task(s)
-      </p>
-
       {visibleTasks.length === 0 ? (
         <div className="volunteer-empty-state">
-          <h3>No tasks found</h3>
-          <p>Claim a task from Find Tasks or choose another status.</p>
+          <h3>No tasks in "{activeTab}"</h3>
+          <p className="sn-empty-note">
+            Claim a task from Find Tasks or switch to another tab.
+          </p>
         </div>
       ) : (
         <div className="sn-request-list">
           {visibleTasks.map((task) => (
             <article key={task.id} className="sn-request-card">
+              <div className="sn-request-symbol">
+                {task.category === "Accompanied walks" ? "♡" : "⌁"}
+              </div>
               <div className="sn-request-body">
                 <div className="sn-request-top">
                   <div>
@@ -188,129 +270,73 @@ export default function MyTasks({
                     </span>
                   </div>
 
-                  <span className="sn-status">{task.status}</span>
+                  <span
+                    className={`sn-status ${
+                      task.status === TASK_STATUS.COMPLETED ||
+                      task.status === TASK_STATUS.ASSIGNED
+                        ? "green"
+                        : "gold"
+                    }`}
+                  >
+                    <i />
+                    {task.status}
+                  </span>
                 </div>
 
                 <div className="sn-request-meta">
-                  <span>{task.date}</span>
+                  <span>▣ {task.date}</span>
                   <span>
-                    {task.startTime}–{task.endTime} (Saudi time)
+                    ◷ {task.startTime}–{task.endTime} (Saudi time)
                   </span>
-                  <span>{task.area}</span>
-                  <span>{task.estimatedHours} estimated hr(s)</span>
+                  <span>⌖ {task.area}</span>
+                  <span>⏱ {task.estimatedHours} estimated hr(s)</span>
                 </div>
 
-                <p className="sn-request-details">
-                  {task.description}
-                </p>
+                <p className="sn-request-details">{task.description}</p>
 
-                {task.status === TASK_STATUS.REQUESTED ? (
-                  <p className="sn-muted">
-                    Waiting for caregiver approval. The senior’s
-                    private details remain hidden.
-                  </p>
-                ) : (
-                  <>
-                    <p>
-                      <strong>Senior:</strong>{" "}
-                      {task.seniorName || "Not provided"}
-                    </p>
-                    <p>
-                      <strong>Address:</strong>{" "}
-                      {task.address || "Not provided"}
-                    </p>
-                  </>
-                )}
+                <div className="vol-address-box">
+                  {task.status === TASK_STATUS.REQUESTED ? (
+                    <span className="vol-privacy-note">
+                      🔒 Waiting for caregiver approval. The senior’s private
+                      details remain hidden.
+                    </span>
+                  ) : (
+                    <>
+                      <span>
+                        <strong>Senior:</strong>{" "}
+                        {task.seniorName || "Not provided"}
+                      </span>
+                      <span>
+                        <strong>Address:</strong>{" "}
+                        {task.address || "Not provided"}
+                      </span>
+                    </>
+                  )}
+                </div>
 
                 <div className="sn-request-actions">
                   {task.status === TASK_STATUS.ASSIGNED && (
                     <button
                       type="button"
-                      className="sn-button sn-button-primary"
+                      className="vol-claim-inline-btn"
                       disabled={busyTaskId !== null}
                       onClick={() => handleStartTask(task.id)}
                     >
-                      {busyTaskId === task.id
-                        ? "Starting..."
-                        : "Start Task"}
+                      {busyTaskId === task.id ? "Starting..." : "Start Task"}
                     </button>
                   )}
 
-                  {task.status === TASK_STATUS.IN_PROGRESS &&
-                    completionTaskId !== task.id && (
-                      <button
-                        type="button"
-                        className="sn-button sn-button-primary"
-                        disabled={busyTaskId !== null}
-                        onClick={() => openCompletionForm(task.id)}
-                      >
-                        Complete Task
-                      </button>
-                    )}
-                </div>
-
-                {task.status === TASK_STATUS.IN_PROGRESS &&
-                  completionTaskId === task.id && (
-                    <form
-                      className="volunteer-task-details"
-                      onSubmit={handleSubmitCompletion}
+                  {task.status === TASK_STATUS.IN_PROGRESS && (
+                    <button
+                      type="button"
+                      className="vol-claim-inline-btn"
+                      disabled={busyTaskId !== null}
+                      onClick={() => openCompletionForm(task.id)}
                     >
-                      <h4>Complete Task</h4>
-
-                      <label htmlFor={`notes-${task.id}`}>
-                        Completion notes (required)
-                      </label>
-                      <textarea
-                        id={`notes-${task.id}`}
-                        value={notes}
-                        onChange={(event) => setNotes(event.target.value)}
-                        placeholder="Describe the assistance you provided."
-                        rows={4}
-                        required
-                        disabled={busyTaskId !== null}
-                      />
-
-                      <label htmlFor={`proof-${task.id}`}>
-                        Completion photo{" "}
-                        {task.proofRequired ? "(required)" : "(optional)"}
-                      </label>
-                      <input
-                        id={`proof-${task.id}`}
-                        type="file"
-                        accept="image/*"
-                        required={task.proofRequired}
-                        disabled={busyTaskId !== null}
-                        onChange={(event) =>
-                          setProofFile(event.target.files?.[0] || null)
-                        }
-                      />
-
-                      <div className="sn-modal-actions">
-                        <button
-                          type="button"
-                          className="sn-button sn-button-light"
-                          disabled={busyTaskId !== null}
-                          onClick={() => {
-                            setCompletionTaskId(null);
-                            setNotes("");
-                            setProofFile(null);
-                          }}
-                        >
-                          Cancel
-                        </button>
-
-                        <button
-                          type="submit"
-                          className="sn-button sn-button-primary"
-                          disabled={busyTaskId !== null}
-                        >
-                          {busyTaskId === task.id
-                            ? "Submitting..."
-                            : "Submit Completion"}
-                        </button>
-                      </div>
-                    </form>
+                      Mark Complete
+                    </button>
                   )}
+                </div>
 
                 {task.status === TASK_STATUS.AWAITING_REVIEW && (
                   <p className="sn-muted">
@@ -319,21 +345,115 @@ export default function MyTasks({
                 )}
 
                 {task.completionNotes && (
-                  <p>
-                    <strong>Completion notes:</strong>{" "}
-                    {task.completionNotes}
+                  <p className="vol-saved-notes">
+                    <strong>Completion notes:</strong> {task.completionNotes}
+                    {task.proofFile &&
+                      ` · Proof: ${
+                        typeof task.proofFile === "string"
+                          ? task.proofFile
+                          : task.proofFile.name
+                      }`}
                   </p>
                 )}
 
                 {task.status === TASK_STATUS.COMPLETED && (
                   <p>
                     <strong>Approved service hours:</strong>{" "}
-                    {task.approvedHours}
+                    {task.approvedHours} hr(s)
                   </p>
                 )}
               </div>
             </article>
           ))}
+        </div>
+      )}
+
+      {/* Completion Notes & Proof Modal */}
+      {activeCompletionTask && (
+        <div
+          className="sn-overlay"
+          onMouseDown={(e) => e.target === e.currentTarget && closeCompletionForm()}
+        >
+          <section
+            className="sn-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="complete-task-title"
+          >
+            <button
+              type="button"
+              className="sn-close"
+              onClick={closeCompletionForm}
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <p className="sn-eyebrow">COMPLETE TASK · {activeCompletionTask.id}</p>
+            <h2 id="complete-task-title">Submit Task Completion</h2>
+            <p className="sn-muted">
+              Add your completion notes and proof for{" "}
+              <strong>{activeCompletionTask.title}</strong>.
+            </p>
+
+            <form className="sn-form" onSubmit={handleSubmitCompletion}>
+              <label htmlFor={`notes-${activeCompletionTask.id}`}>
+                Completion notes *
+                <textarea
+                  id={`notes-${activeCompletionTask.id}`}
+                  value={notes}
+                  onChange={(event) => setNotes(event.target.value)}
+                  placeholder="Describe the assistance you provided..."
+                  rows={4}
+                  maxLength={300}
+                  autoFocus
+                  required
+                  disabled={busyTaskId !== null}
+                />
+              </label>
+
+              <label htmlFor={`proof-${activeCompletionTask.id}`}>
+                Completion photo{" "}
+                {activeCompletionTask.proofRequired
+                  ? "(required * — JPG or PNG up to 5 MB)"
+                  : "(optional — JPG or PNG up to 5 MB)"}
+                <input
+                  id={`proof-${activeCompletionTask.id}`}
+                  type="file"
+                  accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                  required={activeCompletionTask.proofRequired}
+                  disabled={busyTaskId !== null}
+                  onChange={handleProofChange}
+                />
+              </label>
+
+              {modalError && (
+                <p role="alert" className="file-error">
+                  {modalError}
+                </p>
+              )}
+
+              <div className="sn-modal-actions">
+                <button
+                  type="button"
+                  className="sn-button sn-button-light"
+                  disabled={busyTaskId !== null}
+                  onClick={closeCompletionForm}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="sn-button sn-button-primary"
+                  disabled={busyTaskId !== null}
+                >
+                  {busyTaskId === activeCompletionTask.id
+                    ? "Submitting..."
+                    : "Submit Completion"}
+                </button>
+              </div>
+            </form>
+          </section>
         </div>
       )}
     </section>
