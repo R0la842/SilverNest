@@ -70,7 +70,6 @@ Users can access About, Contact, Safety, Privacy Policy, and Terms of Service pa
 ## Additional Configuration
 
 No additional API keys or environment variables are required for the current front-end prototype.
-
 Email activation and volunteer document submission are simulated front-end interactions and do not require external services.
 
 ## Team Members and Roles
@@ -84,9 +83,8 @@ Email activation and volunteer document submission are simulated front-end inter
 
 Milestone 4 – Interactive Front-End Prototype
 This milestone focuses on implementing the user interface, navigation, responsive design, and interactive features using React.
-
 The application is currently a front-end prototype. Backend integration and persistent data storage are not part of the implemented functionality described here.
 
 ## AI Usage
 
-AI assistance used during this milestone is documented in the AI_USAGE.md file.
+AI assistance used during this milestone is documented in the[AI_USAGE.md](./AI_USAGE.MD) file.
