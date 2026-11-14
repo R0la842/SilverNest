@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   volunteer,
   serviceCategories,
@@ -14,6 +14,17 @@ export default function FindTasks({ tasks = [], onClaimTask }) {
   const [taskToClaim, setTaskToClaim] = useState(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!taskToClaim) return;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setTaskToClaim(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [taskToClaim]);
 
   const areas = [...new Set(tasks.map((task) => task.area))];
   const selectedTask = tasks.find((task) => task.id === selectedTaskId);
@@ -56,50 +67,54 @@ export default function FindTasks({ tasks = [], onClaimTask }) {
     const hasOverlap = tasks.some(
       (other) =>
         other.volunteerId === volunteer.id &&
-        [TASK_STATUS.REQUESTED, TASK_STATUS.ASSIGNED, TASK_STATUS.IN_PROGRESS].includes(
-          other.status
-        ) &&
+        [
+          TASK_STATUS.REQUESTED,
+          TASK_STATUS.ASSIGNED,
+          TASK_STATUS.IN_PROGRESS,
+        ].includes(other.status) &&
         other.date === task.date &&
         other.startTime < task.endTime &&
         task.startTime < other.endTime
     );
 
     if (hasOverlap) {
-      setError("This task overlaps with another task you have requested or accepted.");
+      setError(
+        "This task overlaps with another task you have requested or accepted."
+      );
       return;
     }
 
     setTaskToClaim(task);
   }
 
-async function confirmClaim() {
-  if (!taskToClaim) return;
+  async function confirmClaim() {
+    if (!taskToClaim) return;
 
-  setError("");
-  setMessage("");
+    setError("");
+    setMessage("");
 
-  try {
-    if (typeof onClaimTask !== "function") {
-      throw new Error("The claim action is not connected yet.");
+    try {
+      if (typeof onClaimTask !== "function") {
+        throw new Error("The claim action is not connected yet.");
+      }
+
+      // The parent rechecks approval, availability, and overlap.
+      await onClaimTask(taskToClaim.id);
+
+      setTaskToClaim(null);
+      setSelectedTaskId(null);
+      setMessage(
+        "Request submitted! Please wait for caregiver approval."
+      );
+    } catch (err) {
+      setTaskToClaim(null);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Could not claim this task."
+      );
     }
-
-    // The parent rechecks approval, availability, and overlap.
-    await onClaimTask(taskToClaim.id);
-
-    setTaskToClaim(null);
-    setSelectedTaskId(null);
-    setMessage(
-      "Request submitted! Please wait for caregiver approval."
-    );
-  } catch (err) {
-    setTaskToClaim(null);
-    setError(
-      err instanceof Error
-        ? err.message
-        : "Could not claim this task."
-    );
   }
-}
 
   return (
     <section className="senior-box volunteer-find-tasks">
@@ -153,7 +168,11 @@ async function confirmClaim() {
           ))}
         </select>
 
-        <button type="button" className="sn-button sn-button-light" onClick={clearFilters}>
+        <button
+          type="button"
+          className="sn-button sn-button-light"
+          onClick={clearFilters}
+        >
           Clear Filters
         </button>
       </div>
@@ -176,7 +195,11 @@ async function confirmClaim() {
         <div className="volunteer-empty-state">
           <h3>No tasks found</h3>
           <p className="sn-empty-note">Try another keyword, category, or area.</p>
-          <button type="button" className="sn-button sn-button-light" onClick={clearFilters}>
+          <button
+            type="button"
+            className="sn-button sn-button-light"
+            onClick={clearFilters}
+          >
             Clear Filters
           </button>
         </div>
@@ -219,7 +242,9 @@ async function confirmClaim() {
                     type="button"
                     aria-expanded={selectedTaskId === task.id}
                     onClick={() => {
-                      setSelectedTaskId(selectedTaskId === task.id ? null : task.id);
+                      setSelectedTaskId(
+                        selectedTaskId === task.id ? null : task.id
+                      );
                       setError("");
                       setMessage("");
                     }}
@@ -252,7 +277,9 @@ async function confirmClaim() {
                     <p className="vol-privacy-note">
                       🔒 The senior's name and exact address are hidden until caregiver approval.
                     </p>
-                    <p className="sn-muted">SilverNest offers non-medical assistance only.</p>
+                    <p className="sn-muted">
+                      SilverNest offers non-medical assistance only.
+                    </p>
                   </section>
                 )}
               </div>
@@ -267,11 +294,17 @@ async function confirmClaim() {
           className="sn-overlay"
           onMouseDown={(e) => e.target === e.currentTarget && setTaskToClaim(null)}
         >
-          <section className="sn-modal" role="dialog" aria-modal="true" aria-labelledby="claim-title">
+          <section
+            className="sn-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="claim-title"
+          >
             <button
+              type="button"
               className="sn-close"
               onClick={() => setTaskToClaim(null)}
-              aria-label="Close"
+              aria-label="Close confirmation"
             >
               ×
             </button>
@@ -287,11 +320,12 @@ async function confirmClaim() {
                 <strong>Task details:</strong> {taskToClaim.description}
               </p>
               <p>
-                <strong>Schedule:</strong> {taskToClaim.date}, {taskToClaim.startTime}–
-                {taskToClaim.endTime}
+                <strong>Schedule:</strong> {taskToClaim.date},{" "}
+                {taskToClaim.startTime}–{taskToClaim.endTime}
               </p>
               <p>
-                <strong>Area:</strong> {taskToClaim.area} · {taskToClaim.distanceKm} km away
+                <strong>Area:</strong> {taskToClaim.area} ·{" "}
+                {taskToClaim.distanceKm} km away
               </p>
             </div>
 
