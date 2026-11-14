@@ -64,7 +64,7 @@ function VolunteerDashboard() {
     emergencyContact: 'Sara Ahmed · 055 987 6543',
   });
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-
+const [profileBackup, setProfileBackup] = useState(null);
   // Shared tasks & feedback state
   const [tasks, setTasks] = useState(initialTasks);
   const [feedback] = useState(initialFeedback);
@@ -82,7 +82,7 @@ function VolunteerDashboard() {
     setTimeout(() => setToastMessage(''), 4000);
   };
 
-  const isApproved = volunteer.approvalStatus === 'Approved';
+  const isApproved = volunteerProfile.approvalStatus === 'Approved';
 
   // Derived task lists matching TASK_STATUS in volunteerData.js
   const availableTasks = tasks.filter(
@@ -104,7 +104,7 @@ function VolunteerDashboard() {
     (t) => t.status === TASK_STATUS.COMPLETED
   );
 
-  const myAllTasks = tasks.filter((t) => t.volunteerId === volunteer.id);
+  const myAllTasks = tasks.filter((t) => t.volunteerId === volunteerProfile.id);
 
   const totalApprovedHours = completedTasks.reduce(
     (sum, t) => sum + (t.approvedHours || t.estimatedHours || 0),
@@ -146,7 +146,7 @@ function VolunteerDashboard() {
           ? {
               ...t,
               status: TASK_STATUS.ASSIGNED,
-              volunteerId: volunteer.id,
+              volunteerId: volunteerProfile.id,
               seniorName: t.seniorName || 'Mariam Saleh',
               assignedAt: nowIso,
             }
@@ -330,14 +330,14 @@ const tabTitles = {
                 {unreadNotifCount > 0 && <i />}
               </button>
               <span className="senior-avatar">
-                {volunteer.name.charAt(0).toUpperCase()}
+                {volunteerProfile.name.charAt(0).toUpperCase()}
               </span>
               <button
                 type="button"
                 className="senior-profile"
                 onClick={() => setActiveTab('profile')}
               >
-                {volunteer.name} ⌄
+                {volunteerProfile.name} ⌄
               </button>
             </div>
           </header>
@@ -398,7 +398,7 @@ const tabTitles = {
                   {isApproved
                     ? '✓ Vetted & Approved Volunteer'
                     : 'Pending Admin Approval'}{' '}
-                  · {volunteer.neighborhood}, {volunteer.city}
+                  · {volunteerProfile.neighborhood}, {volunteerProfile.city}
                 </p>
               </div>
             </div>
@@ -413,7 +413,7 @@ const tabTitles = {
             {activeTab === 'overview' && (
               <>
                 <div className="senior-greeting">
-                  <h2>Good morning, {volunteer.name.split(' ')[0]}!</h2>
+                  <h2>Good morning, {volunteerProfile.name.split(' ')[0]}!</h2>
                   <p>Welcome to your SilverNest volunteer dashboard.</p>
                 </div>
 
@@ -438,7 +438,7 @@ const tabTitles = {
                       <h3>Approved Hours</h3>
                     </div>
                     <p>
-                      Goal: {volunteer.serviceHoursGoal}h ·{' '}
+                      Goal: {volunteerProfile.serviceHoursGoal}h ·{' '}
                       {completedTasks.length} approved tasks
                     </p>
                   </article>
@@ -450,7 +450,7 @@ const tabTitles = {
                       </span>
                       <h3>Open Requests</h3>
                     </div>
-                    <p>Available in {volunteer.city}</p>
+                    <p>Available in {volunteerProfile.city}</p>
                   </article>
                 </div>
 
@@ -598,8 +598,9 @@ const tabTitles = {
                   tasks={myAllTasks}
                   completedTasks={[...completedTasks, ...awaitingReviewTasks]}
                   feedback={feedback}
-                  volunteer={volunteer}
-                  volunteerProfile={volunteer}
+                  volunteer={volunteerProfile}
+                  volunteerProfile={volunteerProfile}
+
                 />
               </section>
             )}
@@ -634,12 +635,7 @@ const tabTitles = {
                 )}
               </section>
             )}
-                        {/* NOTIFICATIONS TAB */}
-            {activeTab === 'notifications' && (
-              <section className="senior-box">
-                ...
-              </section>
-            )}
+        
 
 {/* PROFILE TAB */}
 {activeTab === 'profile' && (
@@ -679,7 +675,10 @@ const tabTitles = {
           <button
             type="button"
             className="senior-profile-edit"
-            onClick={() => setIsEditingProfile(true)}
+            onClick={() => {
+  setProfileBackup({ ...volunteerProfile });
+  setIsEditingProfile(true);
+}}
           >
             Edit personal information
           </button>
@@ -689,6 +688,7 @@ const tabTitles = {
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          setProfileBackup(null);
           setIsEditingProfile(false);
           showToast('Personal information updated.');
         }}
@@ -750,7 +750,14 @@ const tabTitles = {
           <button
             type="button"
             className="settings-cancel"
-            onClick={() => setIsEditingProfile(false)}
+            onClick={() => {
+  if (profileBackup) {
+    setVolunteerProfile(profileBackup);
+  }
+
+  setProfileBackup(null);
+  setIsEditingProfile(false);
+}}
           >
             Cancel
           </button>
