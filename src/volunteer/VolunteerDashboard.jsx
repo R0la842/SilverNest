@@ -3,32 +3,71 @@ import { Link } from 'react-router-dom';
 import '../MemberFeatures.css';
 import './Volunteer.css';
 import {
+  TASK_STATUS,
+  volunteer,
+  serviceCategories,
   initialTasks,
-  initialSafetyAlerts,
-  initialNotifications,
-  volunteerProfile,
+  initialFeedback,
 } from './volunteerData';
 import FindTasks from './FindTasks';
 import MyTasks from './MyTasks';
 import ServiceHours from './ServiceHours';
 
+const defaultSafetyAlerts = [
+  {
+    id: 'ALERT-01',
+    severity: 'high',
+    title: 'Non-Medical Assistance Policy',
+    message:
+      'Volunteers must only perform non-medical errands, light chores, and companionship. Never administer medication or lift heavy objects.',
+    dismissed: false,
+  },
+  {
+    id: 'ALERT-02',
+    severity: 'medium',
+    title: 'Verify Senior Identity Upon Arrival',
+    message:
+      'Confirm the senior’s name and task details at the doorstep and report any safety concerns immediately.',
+    dismissed: false,
+  },
+];
+
+const defaultNotifications = [
+  {
+    id: 'NOTIF-01',
+    type: 'assignment',
+    taskId: 'TASK-006',
+    targetTab: 'mytasks',
+    message: 'Assigned task: "Help with light kitchen chores" for Mariam Saleh.',
+    time: '2 hours ago',
+    read: false,
+  },
+  {
+    id: 'NOTIF-02',
+    type: 'available',
+    taskId: 'TASK-001',
+    targetTab: 'find',
+    message: 'New request in Al Doha: "Pick up weekly groceries" (1.2 km away).',
+    time: '4 hours ago',
+    read: false,
+  },
+];
+
 function VolunteerDashboard() {
-  // Navigation & search state
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifPanel, setShowNotifPanel] = useState(false);
 
-  // Shared tasks state across all tabs
+  // Shared tasks & feedback state
   const [tasks, setTasks] = useState(initialTasks);
+  const [feedback] = useState(initialFeedback);
 
   // Safety alerts & notifications
-  const [safetyAlerts, setSafetyAlerts] = useState(initialSafetyAlerts);
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const [safetyAlerts, setSafetyAlerts] = useState(defaultSafetyAlerts);
+  const [notifications, setNotifications] = useState(defaultNotifications);
 
   // Highlighted task when navigating from a notification
   const [highlightedTaskId, setHighlightedTaskId] = useState(null);
-
-  // Toast feedback banner
   const [toastMessage, setToastMessage] = useState('');
 
   const showToast = (msg) => {
@@ -36,21 +75,40 @@ function VolunteerDashboard() {
     setTimeout(() => setToastMessage(''), 4000);
   };
 
-  // Derived task lists
-  const availableTasks = tasks.filter((t) => t.status === 'Available');
-  const assignedTasks = tasks.filter((t) => t.status === 'Assigned');
-  const inProgressTasks = tasks.filter((t) => t.status === 'In Progress');
-  const completedTasks = tasks.filter((t) => t.status === 'Completed');
+  const isApproved = volunteer.approvalStatus === 'Approved';
 
-  const totalApprovedHours = completedTasks
-    .filter((t) => t.hoursApproved)
-    .reduce((sum, t) => sum + (t.actualHours || t.estimatedHours), 0);
+  // Derived task lists matching TASK_STATUS in volunteerData.js
+  const availableTasks = tasks.filter(
+    (t) => t.status === TASK_STATUS.AVAILABLE
+  );
+  const requestedTasks = tasks.filter(
+    (t) => t.status === TASK_STATUS.REQUESTED
+  );
+  const assignedTasks = tasks.filter(
+    (t) => t.status === TASK_STATUS.ASSIGNED
+  );
+  const inProgressTasks = tasks.filter(
+    (t) => t.status === TASK_STATUS.IN_PROGRESS
+  );
+  const awaitingReviewTasks = tasks.filter(
+    (t) => t.status === TASK_STATUS.AWAITING_REVIEW
+  );
+  const completedTasks = tasks.filter(
+    (t) => t.status === TASK_STATUS.COMPLETED
+  );
+
+  const myAllTasks = tasks.filter((t) => t.volunteerId === volunteer.id);
+
+  const totalApprovedHours = completedTasks.reduce(
+    (sum, t) => sum + (t.approvedHours || t.estimatedHours || 0),
+    0
+  );
 
   const unreadNotifCount = notifications.filter((n) => !n.read).length;
 
-  // Claim an available task (with approval & schedule overlap check)
+  // Claim an available task (with approval & schedule conflict check)
   const handleClaimTask = (taskId) => {
-    if (!volunteerProfile.isApproved) {
+    if (!isApproved) {
       showToast('Your volunteer profile must be approved before claiming tasks.');
       return;
     }
@@ -58,34 +116,49 @@ function VolunteerDashboard() {
     const targetTask = tasks.find((t) => t.id === taskId);
     if (!targetTask) return;
 
-    const hasConflict = tasks.some(
+    const hasConflict = myAllTasks.some(
       (t) =>
-        (t.status === 'Assigned' || t.status === 'In Progress') &&
+        (t.status === TASK_STATUS.REQUESTED ||
+          t.status === TASK_STATUS.ASSIGNED ||
+          t.status === TASK_STATUS.IN_PROGRESS) &&
         t.date === targetTask.date &&
-        t.time === targetTask.time
+        t.startTime === targetTask.startTime
     );
 
     if (hasConflict) {
       showToast(
-        `Schedule conflict: You already have a task scheduled on ${targetTask.date} at ${targetTask.time}.`
+        `Schedule conflict: You already have a task scheduled on ${targetTask.date} at ${targetTask.startTime}.`
       );
       return;
     }
 
+    const nowIso = new Date().toISOString();
     setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, status: 'Assigned' } : t))
+      prev.map((t) =>
+        t.id === taskId
+          ? {
+              ...t,
+              status: TASK_STATUS.ASSIGNED,
+              volunteerId: volunteer.id,
+              seniorName: t.seniorName || 'Mariam Saleh',
+              assignedAt: nowIso,
+            }
+          : t
+      )
     );
 
-    const newNotif = {
-      id: `notif-${Date.now()}`,
-      type: 'assignment',
-      taskId: targetTask.id,
-      targetTab: 'mytasks',
-      message: `You claimed "${targetTask.title}" for ${targetTask.seniorName}.`,
-      time: 'Just now',
-      read: false,
-    };
-    setNotifications((prev) => [newNotif, ...prev]);
+    setNotifications((prev) => [
+      {
+        id: `NOTIF-${Date.now()}`,
+        type: 'assignment',
+        taskId: targetTask.id,
+        targetTab: 'mytasks',
+        message: `You claimed "${targetTask.title}" in ${targetTask.area}.`,
+        time: 'Just now',
+        read: false,
+      },
+      ...prev,
+    ]);
     showToast(`Task "${targetTask.title}" claimed and added to My Tasks!`);
   };
 
@@ -93,7 +166,15 @@ function VolunteerDashboard() {
   const handleStartTask = (taskId) => {
     const targetTask = tasks.find((t) => t.id === taskId);
     setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, status: 'In Progress' } : t))
+      prev.map((t) =>
+        t.id === taskId
+          ? {
+              ...t,
+              status: TASK_STATUS.IN_PROGRESS,
+              startedAt: new Date().toISOString(),
+            }
+          : t
+      )
     );
     if (targetTask) {
       showToast(`Started "${targetTask.title}". Status updated to In Progress.`);
@@ -101,35 +182,36 @@ function VolunteerDashboard() {
   };
 
   // Complete an in-progress task with notes and photo proof
-  const handleCompleteTask = (taskId, completionNote, proofFileName) => {
+  const handleCompleteTask = (taskId, completionNotes, proofFileName) => {
     const targetTask = tasks.find((t) => t.id === taskId);
     setTasks((prev) =>
       prev.map((t) =>
         t.id === taskId
           ? {
               ...t,
-              status: 'Completed',
-              completionNote,
-              proofImage: proofFileName,
-              actualHours: t.estimatedHours,
-              hoursApproved: false,
+              status: TASK_STATUS.AWAITING_REVIEW,
+              completionNotes,
+              proofFile: proofFileName,
+              completedAt: new Date().toISOString(),
             }
           : t
       )
     );
 
     if (targetTask) {
-      const newNotif = {
-        id: `notif-${Date.now()}`,
-        type: 'completion',
-        taskId: targetTask.id,
-        targetTab: 'hours',
-        message: `Task "${targetTask.title}" submitted for completion. Hours pending admin approval.`,
-        time: 'Just now',
-        read: false,
-      };
-      setNotifications((prev) => [newNotif, ...prev]);
-      showToast(`"${targetTask.title}" marked as completed!`);
+      setNotifications((prev) => [
+        {
+          id: `NOTIF-${Date.now()}`,
+          type: 'completion',
+          taskId: targetTask.id,
+          targetTab: 'hours',
+          message: `"${targetTask.title}" submitted for review. Service hours pending approval.`,
+          time: 'Just now',
+          read: false,
+        },
+        ...prev,
+      ]);
+      showToast(`"${targetTask.title}" submitted for review!`);
     }
   };
 
@@ -156,15 +238,13 @@ function VolunteerDashboard() {
   };
 
   const activeSafetyAlerts = safetyAlerts.filter((a) => !a.dismissed);
+  const activeCount =
+    requestedTasks.length + assignedTasks.length + inProgressTasks.length;
 
   const navItems = [
     { id: 'overview', label: 'Dashboard', icon: '⌂' },
     { id: 'find', label: `Find Tasks (${availableTasks.length})`, icon: '⌕' },
-    {
-      id: 'mytasks',
-      label: `My Tasks (${assignedTasks.length + inProgressTasks.length})`,
-      icon: '▤',
-    },
+    { id: 'mytasks', label: `My Tasks (${activeCount})`, icon: '▤' },
     { id: 'hours', label: 'Service Hours', icon: '◷' },
     { id: 'notifications', label: 'Notifications', icon: '♧' },
   ];
@@ -195,7 +275,10 @@ function VolunteerDashboard() {
           </Link>
           <p className="senior-workspace">Volunteer workspace</p>
 
-          <nav className="senior-nav" aria-label="Volunteer workspace navigation">
+          <nav
+            className="senior-nav"
+            aria-label="Volunteer workspace navigation"
+          >
             {navItems.map((item) => (
               <button
                 key={item.id}
@@ -239,14 +322,14 @@ function VolunteerDashboard() {
                 {unreadNotifCount > 0 && <i />}
               </button>
               <span className="senior-avatar">
-                {volunteerProfile.name.charAt(0).toUpperCase()}
+                {volunteer.name.charAt(0).toUpperCase()}
               </span>
               <button
                 type="button"
                 className="senior-profile"
                 onClick={() => setActiveTab('hours')}
               >
-                {volunteerProfile.name} ⌄
+                {volunteer.name} ⌄
               </button>
             </div>
           </header>
@@ -304,10 +387,10 @@ function VolunteerDashboard() {
                 <h1>{tabTitles[activeTab]}</h1>
                 <p>
                   Volunteer workspace ·{' '}
-                  {volunteerProfile.isApproved
+                  {isApproved
                     ? '✓ Vetted & Approved Volunteer'
                     : 'Pending Admin Approval'}{' '}
-                  · {volunteerProfile.neighborhood}
+                  · {volunteer.neighborhood}, {volunteer.city}
                 </p>
               </div>
             </div>
@@ -322,7 +405,7 @@ function VolunteerDashboard() {
             {activeTab === 'overview' && (
               <>
                 <div className="senior-greeting">
-                  <h2>Good morning, {volunteerProfile.name.split(' ')[0]}!</h2>
+                  <h2>Good morning, {volunteer.name.split(' ')[0]}!</h2>
                   <p>Welcome to your SilverNest volunteer dashboard.</p>
                 </div>
 
@@ -330,14 +413,12 @@ function VolunteerDashboard() {
                 <div className="senior-stat-grid">
                   <article>
                     <div>
-                      <span className="senior-stat-number">
-                        {assignedTasks.length + inProgressTasks.length}
-                      </span>
+                      <span className="senior-stat-number">{activeCount}</span>
                       <h3>Active Tasks</h3>
                     </div>
                     <p>
-                      {assignedTasks.length} assigned · {inProgressTasks.length} in
-                      progress
+                      {assignedTasks.length} assigned · {inProgressTasks.length}{' '}
+                      in progress · {requestedTasks.length} requested
                     </p>
                   </article>
 
@@ -348,7 +429,10 @@ function VolunteerDashboard() {
                       </span>
                       <h3>Approved Hours</h3>
                     </div>
-                    <p>{completedTasks.length} completed tasks</p>
+                    <p>
+                      Goal: {volunteer.serviceHoursGoal}h ·{' '}
+                      {completedTasks.length} approved tasks
+                    </p>
                   </article>
 
                   <article>
@@ -358,7 +442,7 @@ function VolunteerDashboard() {
                       </span>
                       <h3>Open Requests</h3>
                     </div>
-                    <p>Available in {volunteerProfile.neighborhood}</p>
+                    <p>Available in {volunteer.city}</p>
                   </article>
                 </div>
 
@@ -407,23 +491,26 @@ function VolunteerDashboard() {
                       </button>
                     </div>
 
-                    {[...inProgressTasks, ...assignedTasks].length > 0 ? (
-                      [...inProgressTasks, ...assignedTasks]
+                    {[...inProgressTasks, ...assignedTasks, ...requestedTasks]
+                      .length > 0 ? (
+                      [...inProgressTasks, ...assignedTasks, ...requestedTasks]
                         .slice(0, 3)
                         .map((task) => (
                           <div className="senior-activity-row" key={task.id}>
                             <div>
                               <strong>{task.title}</strong>
                               <span>
-                                {task.seniorName} · {task.date} at {task.time} ·{' '}
-                                {task.status}
+                                {task.seniorName || task.area} · {task.date} (
+                                {task.startTime}–{task.endTime}) · {task.status}
                               </span>
                             </div>
                             <button
                               type="button"
                               onClick={() => setActiveTab('mytasks')}
                             >
-                              {task.status === 'In Progress' ? 'Complete' : 'Open'}
+                              {task.status === TASK_STATUS.IN_PROGRESS
+                                ? 'Complete'
+                                : 'Open'}
                             </button>
                           </div>
                         ))
@@ -468,10 +555,12 @@ function VolunteerDashboard() {
             {activeTab === 'find' && (
               <section className="senior-box">
                 <FindTasks
+                  tasks={availableTasks}
                   availableTasks={availableTasks}
+                  categories={serviceCategories}
                   onClaimTask={handleClaimTask}
                   highlightedTaskId={highlightedTaskId}
-                  isApproved={volunteerProfile.isApproved}
+                  isApproved={isApproved}
                   externalSearch={searchQuery}
                 />
               </section>
@@ -481,8 +570,11 @@ function VolunteerDashboard() {
             {activeTab === 'mytasks' && (
               <section className="senior-box">
                 <MyTasks
+                  tasks={myAllTasks}
+                  requestedTasks={requestedTasks}
                   assignedTasks={assignedTasks}
                   inProgressTasks={inProgressTasks}
+                  awaitingReviewTasks={awaitingReviewTasks}
                   completedTasks={completedTasks}
                   onStartTask={handleStartTask}
                   onCompleteTask={handleCompleteTask}
@@ -495,8 +587,11 @@ function VolunteerDashboard() {
             {activeTab === 'hours' && (
               <section className="senior-box">
                 <ServiceHours
-                  completedTasks={completedTasks}
-                  volunteerProfile={volunteerProfile}
+                  tasks={myAllTasks}
+                  completedTasks={[...completedTasks, ...awaitingReviewTasks]}
+                  feedback={feedback}
+                  volunteer={volunteer}
+                  volunteerProfile={volunteer}
                 />
               </section>
             )}
