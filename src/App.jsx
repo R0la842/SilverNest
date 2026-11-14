@@ -3,6 +3,8 @@ import { Route, Routes, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useEffect } from 'react';
 import { useState } from 'react';
 import MemberFeatures from './MemberFeatures.jsx';
+import VolunteerDashboard from './volunteer/VolunteerDashboard.jsx';
+import MemberFeatures from './MemberFeatures.jsx';
 function Navbar() {
   return (
     <nav className="navbar">
