@@ -75,7 +75,7 @@ Email activation and volunteer document submission are simulated front-end inter
 
 ## Team Members and Roles
 
-- Rola Alshahrani – 
+- Rola Alshahrani – Landing Page, Sign Up, Login, Services, Service Details, and Footer Pages.
 - Rimas Binotay – 
 - Alanoud Hazazi – 
 - Sidrah Sanaullah – 
