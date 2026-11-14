@@ -12,11 +12,17 @@ export default function ServiceHours({
 }) {
   const [selectedMonth, setSelectedMonth] = useState("");
 
+  const myTasks = tasks.filter(
+    (task) => task.volunteerId === volunteer.id
+  );
+
   // Only approved completions count toward service hours.
-  const completedTasks = tasks.filter(
-    (task) =>
-      task.volunteerId === volunteer.id &&
-      task.status === TASK_STATUS.COMPLETED
+  const completedTasks = myTasks.filter(
+    (task) => task.status === TASK_STATUS.COMPLETED
+  );
+
+  const pendingReviewTasks = myTasks.filter(
+    (task) => task.status === TASK_STATUS.AWAITING_REVIEW
   );
 
   const visibleTasks = completedTasks
@@ -62,12 +68,59 @@ export default function ServiceHours({
         ).toFixed(1)
       : null;
 
+  // Build chronological activity timeline sorted by actual timestamp (RU9)
+  const activityEvents = myTasks
+    .flatMap((task) => {
+      const events = [];
+      if (task.requestedAt) {
+        events.push({
+          id: `${task.id}-req`,
+          timestamp: task.requestedAt,
+          label: `Requested "${task.title}" (${task.id})`,
+        });
+      }
+      if (task.assignedAt) {
+        events.push({
+          id: `${task.id}-asg`,
+          timestamp: task.assignedAt,
+          label: `Approved & assigned to "${task.title}" (${task.id})`,
+        });
+      }
+      if (task.startedAt) {
+        events.push({
+          id: `${task.id}-str`,
+          timestamp: task.startedAt,
+          label: `Started task "${task.title}" (${task.id})`,
+        });
+      }
+      if (task.completedAt) {
+        events.push({
+          id: `${task.id}-cmp`,
+          timestamp: task.completedAt,
+          label: `Submitted completion for "${task.title}" (${task.id})`,
+        });
+      }
+      if (task.reviewedAt && task.status === TASK_STATUS.COMPLETED) {
+        events.push({
+          id: `${task.id}-rev`,
+          timestamp: task.reviewedAt,
+          label: `Completion approved (+${task.approvedHours} hrs) for "${task.title}" (${task.id})`,
+        });
+      }
+      return events;
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.timestamp).getTime() -
+        new Date(a.timestamp).getTime()
+    );
+
   return (
     <section className="senior-box volunteer-service-hours">
       <div className="senior-box-heading">
         <div>
           <h2>Service Hours</h2>
-          <p>Track your approved contributions and feedback.</p>
+          <p>Track your approved contributions, activity timeline, and feedback.</p>
         </div>
       </div>
 
@@ -92,6 +145,12 @@ export default function ServiceHours({
           </p>
         </article>
       </div>
+
+      {pendingReviewTasks.length > 0 && (
+        <p className="vol-privacy-note" role="status">
+          ⏳ {pendingReviewTasks.length} completed task(s) awaiting caregiver review before hours are credited.
+        </p>
+      )}
 
       {/* Overall service-hours goal */}
       {goal > 0 && (
@@ -191,12 +250,41 @@ export default function ServiceHours({
                     </td>
 
                     <td>
-                      {(task.approvedHours || 0).toFixed(1)}
+                      <span className="vol-hours-badge">
+                        +{(task.approvedHours || 0).toFixed(1)} hrs
+                      </span>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+      </section>
+
+      {/* Activity Timeline (RU9) */}
+      <section className="vol-timeline-section">
+        <h3>Activity Timeline</h3>
+        <p className="sn-muted">All times are Saudi time</p>
+
+        {activityEvents.length === 0 ? (
+          <p className="sn-empty-note">No volunteer activity recorded yet.</p>
+        ) : (
+          <div className="sn-request-list">
+            {activityEvents.map((event) => (
+              <div className="senior-activity-row" key={event.id}>
+                <span>{event.label}</span>
+                <small className="sn-muted">
+                  <time dateTime={event.timestamp}>
+                    {new Date(event.timestamp).toLocaleString("en-GB", {
+                      timeZone: "Asia/Riyadh",
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
+                  </time>
+                </small>
+              </div>
+            ))}
           </div>
         )}
       </section>
@@ -220,33 +308,33 @@ export default function ServiceHours({
               return (
                 <article
                   key={review.id}
-                  className="sn-request-card"
+                  className="vol-feedback-card"
                 >
-                  <div className="sn-request-body">
-                    <h4>{task.title}</h4>
-
-                    <p>
-                      <strong>{review.reviewerName}</strong>
-                      {" · "}
-                      {review.reviewerRole}
-                    </p>
-
-                    <p>Rating: {review.rating} / 5</p>
-
-                    <p>
-                      {review.comment || "No written comment."}
-                    </p>
-
-                    <p className="sn-muted">
-                      <time dateTime={review.createdAt}>
-                        {new Date(
-                          review.createdAt
-                        ).toLocaleDateString("en-GB", {
-                          timeZone: "Asia/Riyadh",
-                        })}
-                      </time>
-                    </p>
+                  <div className="vol-feedback-top">
+                    <div>
+                      <strong>{task?.title || review.taskId}</strong>
+                      <small>
+                        {review.reviewerName} · {review.reviewerRole}
+                      </small>
+                    </div>
+                    <span
+                      className="vol-stars"
+                      aria-label={`${review.rating} out of 5 stars`}
+                    >
+                      {"★".repeat(review.rating)}
+                      {"☆".repeat(5 - review.rating)} ({review.rating}.0)
+                    </span>
                   </div>
+
+                  <p>“{review.comment || "No written comment."}”</p>
+
+                  <p className="sn-muted">
+                    <time dateTime={review.createdAt}>
+                      {new Date(review.createdAt).toLocaleDateString("en-GB", {
+                        timeZone: "Asia/Riyadh",
+                      })}
+                    </time>
+                  </p>
                 </article>
               );
             })}
