@@ -11,6 +11,7 @@ import AdminRequests from './pages/admin/Requests.jsx';
 import AdminIssues from './pages/admin/ReportedIssues.jsx';
 import AdminStatistics from './pages/admin/Statistics.jsx';
 import AdminSettings from './pages/admin/Settings.jsx';
+import AdminLayout from "./components/admin/AdminLayout.jsx";
 
 function Navbar() {
   return (
@@ -33,6 +34,7 @@ function Navbar() {
         <Link to="/signup" className="signup-btn">
           Sign Up
         </Link>
+        <Link to="/admin">Admin Demo</Link>
       </div>
     </nav>
   );
@@ -841,6 +843,13 @@ function App() {
         <Route path="/admin/issues" element={<AdminIssues />} />
         <Route path="/admin/statistics" element={<AdminStatistics />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
+        <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>}/>
+        <Route path="/admin/users" element={<AdminLayout><AdminUsers /></AdminLayout>}/>
+        <Route path="/admin/volunteers" element={<AdminLayout><AdminVolunteers /></AdminLayout>}/>
+        <Route path="/admin/requests" element={<AdminLayout><AdminRequests /></AdminLayout>}/>
+        <Route path="/admin/issues" element={<AdminLayout><AdminIssues /></AdminLayout>}/>
+        <Route path="/admin/statistics" element={<AdminLayout><AdminStatistics /></AdminLayout>}/>
+        <Route path="/admin/settings" element={<AdminLayout><AdminSettings /></AdminLayout>}/>
 
 
       </Routes>
