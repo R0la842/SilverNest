@@ -78,3 +78,34 @@
 .ad-donut-hole span { font-size: 0.75rem; color: #7a799a; }
 .ad-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .ad-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+
+.ad-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.ad-card {
+  min-width: 0;
+}
+
+.ad-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Responsive layout for tablet and mobile */
+@media (max-width: 900px) {
+  .ad-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .ad-grid {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+}
