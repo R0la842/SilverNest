@@ -8,7 +8,6 @@ import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import AdminUsers from './pages/admin/UserManagement.jsx';
 import AdminVolunteers from './pages/admin/Volunteers.jsx';
 import AdminRequests from './pages/admin/Requests.jsx';
-import AdminRequests from './pages/admin/Requests.jsx';
 import AdminIssues from './pages/admin/ReportedIssues.jsx';
 import AdminStatistics from './pages/admin/Statistics.jsx';
 import AdminSettings from './pages/admin/Settings.jsx';
@@ -838,7 +837,6 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/volunteers" element={<AdminVolunteers />} />
-        <Route path="/admin/requests" element={<AdminRequests />} />
         <Route path="/admin/requests" element={<AdminRequests />} />
         <Route path="/admin/issues" element={<AdminIssues />} />
         <Route path="/admin/statistics" element={<AdminStatistics />} />
