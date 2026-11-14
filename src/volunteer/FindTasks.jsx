@@ -72,15 +72,34 @@ export default function FindTasks({ tasks = [], onClaimTask }) {
     setTaskToClaim(task);
   }
 
-  function confirmClaim() {
-    if (!taskToClaim) return;
-    if (onClaimTask) {
-      onClaimTask(taskToClaim.id);
+async function confirmClaim() {
+  if (!taskToClaim) return;
+
+  setError("");
+  setMessage("");
+
+  try {
+    if (typeof onClaimTask !== "function") {
+      throw new Error("The claim action is not connected yet.");
     }
+
+    // The parent rechecks approval, availability, and overlap.
+    await onClaimTask(taskToClaim.id);
+
     setTaskToClaim(null);
     setSelectedTaskId(null);
-    setMessage("Request submitted! Please wait for caregiver approval.");
+    setMessage(
+      "Request submitted! Please wait for caregiver approval."
+    );
+  } catch (err) {
+    setTaskToClaim(null);
+    setError(
+      err instanceof Error
+        ? err.message
+        : "Could not claim this task."
+    );
   }
+}
 
   return (
     <section className="senior-box volunteer-find-tasks">

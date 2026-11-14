@@ -14,6 +14,21 @@ export default function VolunteerDashboard() {
   const [tasks, setTasks] = useState(initialTasks);
   const [feedback] = useState(initialFeedback);
   const [activePage, setActivePage] = useState("overview");
+  const [safetyAcknowledged, setSafetyAcknowledged] = useState(false);
+  const [notifications, setNotifications] = useState([
+    {
+      id: "NOTIF-01",
+      text: "Caregiver approved your assignment for Help with light kitchen chores (TASK-006).",
+      targetPage: "myTasks",
+      unread: true,
+    },
+    {
+      id: "NOTIF-02",
+      text: "New task posted in Al Doha: Pick up weekly groceries (TASK-001).",
+      targetPage: "findTasks",
+      unread: true,
+    },
+  ]);
 
   const myTasks = tasks.filter(
     (task) => task.volunteerId === volunteer.id
@@ -52,10 +67,44 @@ export default function VolunteerDashboard() {
     (task) => task.status === TASK_STATUS.AVAILABLE
   ).length;
 
+  function hasScheduleOverlap(taskList, candidateTask) {
+    return taskList.some(
+      (other) =>
+        other.volunteerId === volunteer.id &&
+        [
+          TASK_STATUS.REQUESTED,
+          TASK_STATUS.ASSIGNED,
+          TASK_STATUS.IN_PROGRESS,
+        ].includes(other.status) &&
+        other.date === candidateTask.date &&
+        other.startTime < candidateTask.endTime &&
+        candidateTask.startTime < other.endTime
+    );
+  }
+
   function handleClaimTask(taskId) {
+    if (volunteer.approvalStatus !== "Approved") {
+      throw new Error(
+        "Your volunteer account must be approved before claiming tasks."
+      );
+    }
+
+    const target = tasks.find((task) => task.id === taskId);
+    if (!target || target.status !== TASK_STATUS.AVAILABLE) {
+      throw new Error("This task is no longer available.");
+    }
+
+    if (hasScheduleOverlap(tasks, target)) {
+      throw new Error(
+        "This task overlaps with another task you have requested or accepted."
+      );
+    }
+
     setTasks((previous) =>
       previous.map((task) =>
-        task.id === taskId && task.status === TASK_STATUS.AVAILABLE
+        task.id === taskId &&
+        task.status === TASK_STATUS.AVAILABLE &&
+        !hasScheduleOverlap(previous, task)
           ? {
               ...task,
               status: TASK_STATUS.REQUESTED,
@@ -81,7 +130,9 @@ export default function VolunteerDashboard() {
 
     setTasks((previous) =>
       previous.map((task) =>
-        task.id === taskId
+        task.id === taskId &&
+        task.volunteerId === volunteer.id &&
+        task.status === TASK_STATUS.ASSIGNED
           ? {
               ...task,
               status: TASK_STATUS.IN_PROGRESS,
@@ -92,7 +143,7 @@ export default function VolunteerDashboard() {
     );
   }
 
-  function handleCompleteTask(taskId, completion) {
+  function handleCompleteTask(taskId, completion = {}) {
     const target = tasks.find(
       (task) =>
         task.id === taskId &&
@@ -104,12 +155,25 @@ export default function VolunteerDashboard() {
       throw new Error("Only in-progress tasks can be completed.");
     }
 
+    const trimmedNotes = (completion.completionNotes || "").trim();
+    if (!trimmedNotes) {
+      throw new Error("Completion notes are required.");
+    }
+
+    const proofFile = completion.proofFile ?? null;
+    if (target.proofRequired && !proofFile) {
+      throw new Error("A completion photo is required for this task.");
+    }
+
     setTasks((previous) =>
       previous.map((task) =>
-        task.id === taskId
+        task.id === taskId &&
+        task.volunteerId === volunteer.id &&
+        task.status === TASK_STATUS.IN_PROGRESS
           ? {
               ...task,
-              ...completion,
+              completionNotes: trimmedNotes,
+              proofFile,
               status: TASK_STATUS.AWAITING_REVIEW,
               completedAt: new Date().toISOString(),
               approvedHours: 0,
@@ -119,8 +183,58 @@ export default function VolunteerDashboard() {
     );
   }
 
+  function openNotification(notification) {
+    setNotifications((previous) =>
+      previous.map((item) =>
+        item.id === notification.id ? { ...item, unread: false } : item
+      )
+    );
+    setActivePage(notification.targetPage);
+  }
+
   return (
     <div className="senior-shell volunteer-portal">
+      {/* Persistent Safety Notice until Acknowledged (RU9) */}
+      {!safetyAcknowledged && (
+        <div
+          className="vol-safety-banner"
+          role="region"
+          aria-label="Volunteer safety reminder"
+        >
+          <p>
+            <strong>Safety Reminder:</strong> SilverNest supports non-medical
+            errands and companionship only. Never administer medication or
+            perform heavy lifting.
+          </p>
+          <button
+            type="button"
+            className="sn-button sn-button-primary"
+            onClick={() => setSafetyAcknowledged(true)}
+          >
+            Acknowledge
+          </button>
+        </div>
+      )}
+
+      {/* Interactive Notifications Bar (RU9) */}
+      {notifications.some((item) => item.unread) && (
+        <div className="vol-notif-bar" aria-label="Volunteer notifications">
+          {notifications
+            .filter((item) => item.unread)
+            .map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className="vol-notif-item"
+                onClick={() => openNotification(item)}
+              >
+                <span>🔔 {item.text}</span>
+                <strong>Open →</strong>
+              </button>
+            ))}
+        </div>
+      )}
+
       {/* Shared Top Navigation */}
       <nav
         className="settings-tabs vol-top-nav"
