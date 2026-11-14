@@ -75,6 +75,15 @@ Use the admin navigation menu to view user accounts, volunteers, requests, repor
 
 Users can access About, Contact, Safety, Privacy Policy, and Terms of Service pages through the footer.
 
+### Senior and Caregiver Features
+
+Seniors can view their dashboard, create, edit, or cancel assistance requests, complete a daily wellness check-in, and review request activity and status. They can also view notifications, message their linked caregiver, and manage their profile and settings.
+
+Family caregivers can view a linked senior’s requests and wellness check-in, create assistance requests, and link or manage a senior from the Profile page. They can review volunteers who offer help and approve or reject them, view notifications, message the senior, and manage caregiver profile and settings.
+
+### Volunteer Features
+Volunteers can view their workspace dashboard with active tasks, approved service hours, and safety alerts. They can browse and filter available non-medical requests, claim tasks with schedule conflict checks, manage assigned and in-progress tasks through completion with notes and proof upload, track approved service hours and senior feedback, view notifications, and edit their profile information.
+
 ## Additional Configuration
 
 No additional API keys or environment variables are required for the current front-end prototype.
@@ -84,7 +93,7 @@ Email activation and volunteer document submission are simulated front-end inter
 
 ## Team Members and Roles
 
-- Rola Alshahrani – Landing Page, Sign Up, Login, Services, Service Details, and Footer Pages.
+- Rola Alshahrani – Set up the React/Vite project and GitHub repository for team collaboration. Developed the Landing Page (Navigation Bar, Intro Section, How It Works), Sign Up and Login, Services and Service Details, and Footer pages. Implemented form validation, simulated email activation, search, filtering, and React Router navigation. Handled styling, debugging, Git merge conflicts.
 - Rimas Binotay – Senior and Caregiver Features, including dashboards, assistance requests, daily wellness check-ins, caregiver-senior linking, volunteer approvals and rejections, notifications, messaging, profile and settings pages, and responsive design.
 - Alanoud Hazazi – Volunteer dashboard, browse/search.filter tasks, task details, claim a task, view assigned tasks, enter completion notes, upload proof if needed, view service hours and feedback
 - Sidrah Sanaullah – Admin Dashboard, manage user accounts, verify volunteers, manage and monitor requests, review reported issues, monitor volunteer performance, view statistics, manage settings, and integrate the pages and shared navigation
