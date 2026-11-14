@@ -6,7 +6,7 @@ import {
 } from "./volunteerData";
 import "./Volunteer.css";
 
-export default function FindTasks({ tasks = [], onClaimTask }) {
+export default function FindTasks({ tasks = [], onClaimTask, highlightedTaskId = null }) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [area, setArea] = useState("");
@@ -15,16 +15,31 @@ export default function FindTasks({ tasks = [], onClaimTask }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (!taskToClaim) return;
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setTaskToClaim(null);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [taskToClaim]);
+useEffect(() => {
+  if (!highlightedTaskId) return;
+
+  setSearch("");
+  setCategory("");
+  setArea("");
+  setSelectedTaskId(highlightedTaskId);
+}, [highlightedTaskId]);
+
+useEffect(() => {
+  if (!taskToClaim) return;
+
+  function handleKeyDown(event) {
+    if (event.key === "Escape") {
+      setTaskToClaim(null);
+    }
+  }
+
+  window.addEventListener("keydown", handleKeyDown);
+
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+  };
+}, [taskToClaim]);
+
 
   const areas = [...new Set(tasks.map((task) => task.area))];
   const selectedTask = tasks.find((task) => task.id === selectedTaskId);
@@ -206,7 +221,9 @@ export default function FindTasks({ tasks = [], onClaimTask }) {
       ) : (
         <div className="sn-request-list">
           {filteredTasks.map((task) => (
-            <article key={task.id} className="sn-request-card">
+         <article
+  key={task.id}
+  className={`sn-request-card ${highlightedTaskId === task.id ? "vol-highlighted-card" : ""}`}>
               <div className="sn-request-symbol">
                 {task.category === "Accompanied walks" ? "♡" : "⌁"}
               </div>
