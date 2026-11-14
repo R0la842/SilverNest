@@ -806,6 +806,7 @@ function Terms() {
   );
 }
 function App() {
+  const { pathname } = useLocation();
   return (
     <>
       <ScrollToSection />
@@ -828,7 +829,7 @@ function App() {
 
 
       </Routes>
-      <Footer />
+      {!pathname.startsWith('/admin') && <Footer />}
 
     </>
   );

@@ -47,7 +47,23 @@ export default function AdminLayout({ children }) {
         <Link to="/login" className="ad-link ad-logout">Log Out</Link>
       </aside>
 
-      <div className="ad-main">{children}</div>
+      
+      <div className="ad-main">
+        <header className="ad-topbar">
+          {/* search box goes here */}
+
+          {/* bell goes here */}
+
+          <div className="ad-user">
+            <span className="ad-avatar" aria-hidden="true">A</span>
+            <span>
+              <strong>Admin User</strong>
+              <small>Administrator</small>
+            </span>
+          </div>
+        </header>
+        {children}
+      </div>
     </div>
   );
 }
