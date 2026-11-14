@@ -49,14 +49,16 @@
 @media (max-width: 600px) {
   .senior-sidebar{padding:10px 12px 8px}
   .senior-logo{font-size:22px}
-  .senior-nav{gap:4px}
-  .senior-nav button{font-size:12px;padding:0 9px;gap:5px}
-  .senior-topbar{height:auto;min-height:60px;padding:9px 12px;gap:8px}
-  .senior-search{min-width:0;height:40px}
+  .senior-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible;margin:9px 0 0;gap:5px}
+  .senior-nav button{justify-content:center;min-width:0;min-height:40px;font-size:12px;padding:0 5px;gap:4px}
+  .senior-nav button span{flex:0 0 17px}
+  .senior-topbar{height:auto;min-height:0;padding:9px 12px;gap:8px;flex-wrap:wrap}
+  .senior-search{order:2;flex:0 0 100%;width:100%;min-width:0;height:40px}
   .senior-account{gap:8px}
   .senior-avatar{width:36px;height:36px}
   .senior-bell{font-size:19px}
   .senior-main{padding:20px 13px 28px}
+  .senior-main>*{max-width:100%}
   .senior-page-title h1{font-size:27px}
   .senior-page-title p{font-size:13px;line-height:1.4}
   .senior-greeting{margin-top:20px}
@@ -115,8 +117,8 @@
 }
 
 @media (max-width: 360px) {
-  .senior-nav button{padding:0 7px;font-size:11px}
-  .senior-nav button span{display:none}
+  .senior-nav button{padding:0 4px;font-size:11px}
+  .senior-nav button span{display:inline-block;flex-basis:15px}
   .senior-account{gap:5px}
   .senior-search input{font-size:13px}
   .senior-main{padding-right:10px;padding-left:10px}
