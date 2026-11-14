@@ -12,5 +12,6 @@
 | C09 | Rola | ChatGPT (GPT-6) | Help identifying and fixing a React Router error caused by placing the Footer component inside Routes. | `src/App.jsx` |
 | C10 | Rola | ChatGPT (GPT-6) | Suggestions for content and interactive features for the About, Contact, Safety, Privacy Policy, and Terms of Service pages. | Proposed footer pages |
 | C11 | Rimas | ChatGPT (GPT-6) | Guidance and implementation help for Senior and Caregiver features, including dashboards, assistance requests, wellness check-ins, caregiver tools, settings, notifications, messaging, and responsive design. | `src/App.jsx`, `src/App.css`, `src/MemberFeatures.jsx`, `src/MemberFeatures.css` |
+| C13 | Sidrah | ChatGPT (GPT-6) | Guidance and example code for the SilverNest admin layout, dashboard statistics, volunteer and request pages, activity chart, responsive design, routes, and GitHub workflow. | `src/App.jsx`, `src/pages/admin/Volunteers.jsx`, `src/pages/admin/Requests.jsx' |
 
 
