@@ -6,6 +6,7 @@ export default function MyTasks({
   tasks = [],
   onStartTask,
   onCompleteTask,
+  highlightedTaskId = null,
 }) {
   const [activeTab, setActiveTab] = useState("Upcoming");
   const [completionTaskId, setCompletionTaskId] = useState(null);
@@ -28,6 +29,22 @@ export default function MyTasks({
   );
 
   // Close modal with Escape key for keyboard accessibility
+  useEffect(() => {
+    if (!highlightedTaskId) return;
+    const target = tasks.find((t) => t.id === highlightedTaskId);
+    if (!target) return;
+
+    if (target.status === TASK_STATUS.IN_PROGRESS) {
+      setActiveTab("In Progress");
+    } else if (
+      target.status === TASK_STATUS.COMPLETED ||
+      target.status === TASK_STATUS.AWAITING_REVIEW
+    ) {
+      setActiveTab("Completed");
+    } else {
+      setActiveTab("Upcoming");
+    }
+  }, [highlightedTaskId, tasks]);
   useEffect(() => {
     if (!activeCompletionTask) return;
 
@@ -257,7 +274,9 @@ export default function MyTasks({
       ) : (
         <div className="sn-request-list">
           {visibleTasks.map((task) => (
-            <article key={task.id} className="sn-request-card">
+   <article
+  key={task.id}
+  className={`sn-request-card ${highlightedTaskId === task.id ? "vol-highlighted-card" : ""}`}>
               <div className="sn-request-symbol">
                 {task.category === "Accompanied walks" ? "♡" : "⌁"}
               </div>

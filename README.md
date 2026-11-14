@@ -73,6 +73,9 @@ Seniors can view their dashboard, create, edit, or cancel assistance requests, c
 
 Family caregivers can view a linked senior’s requests and wellness check-in, create assistance requests, and link or manage a senior from the Profile page. They can review volunteers who offer help and approve or reject them, view notifications, message the senior, and manage caregiver profile and settings.
 
+### Volunteer Features
+Volunteers can view their workspace dashboard with active tasks, approved service hours, and safety alerts. They can browse and filter available non-medical requests, claim tasks with schedule conflict checks, manage assigned and in-progress tasks through completion with notes and proof upload, track approved service hours and senior feedback, view notifications, and edit their profile information.
+
 ## Additional Configuration
 
 No additional API keys or environment variables are required for the current front-end prototype.
