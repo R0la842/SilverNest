@@ -5,6 +5,8 @@ import { useState } from 'react';
 import VolunteerDashboard from './volunteer/VolunteerDashboard.jsx';
 import MemberFeatures from './MemberFeatures.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import AdminUsers from './pages/admin/UserManagement.jsx';
+
 function Navbar() {
   return (
     <nav className="navbar">
@@ -828,6 +830,7 @@ function App() {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
 
 
       </Routes>
