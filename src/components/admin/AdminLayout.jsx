@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Link, useNavigate} from 'react-router-dom';
 import '../../pages/admin/admin.css';
+import { notifications } from '../../data/adminData.js';
 
 const links = [
   { to: '/admin', label: 'Dashboard', end: true },
@@ -16,6 +17,7 @@ export default function AdminLayout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const [bellOpen, setBellOpen] = useState(false);
 
   function handleSearch(event) {
     event.preventDefault();
@@ -70,7 +72,22 @@ export default function AdminLayout({ children }) {
             />
           </form>}
 
-          {/* bell goes here */}
+          {          <div className="ad-bell-wrap">
+            <button
+              type="button"
+              className="ad-bell"
+              aria-label="Notifications"
+              aria-expanded={bellOpen}
+              onClick={() => setBellOpen(!bellOpen)}
+            >
+              🔔<span className="ad-bell-count">{notifications.length}</span>
+            </button>
+            {bellOpen && (
+              <ul className="ad-bell-list">
+                {notifications.map((n) => <li key={n}>{n}</li>)}
+              </ul>
+            )}
+          </div>}
 
           <div className="ad-user">
             <span className="ad-avatar" aria-hidden="true">A</span>

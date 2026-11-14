@@ -32,3 +32,12 @@
 /* Search */
 .ad-search { flex: 1; }
 .ad-search input { width: 100%; max-width: 360px; min-height: 44px; padding: 0 14px; border: 1px solid #c9c9e0; border-radius: 10px; font: inherit; }
+
+/* Notification bell */
+.ad-bell-wrap { position: relative; }
+.ad-bell { min-width: 48px; min-height: 48px; border: 0; background: transparent; font-size: 1.3rem; cursor: pointer; position: relative; }
+.ad-bell:focus-visible { outline: 3px solid #f5a524; outline-offset: 2px; }
+.ad-bell-count { position: absolute; top: 4px; right: 2px; background: #b42318; color: #fff; font-size: 0.7rem; border-radius: 999px; padding: 1px 6px; }
+.ad-bell-list { position: absolute; right: 0; top: 52px; z-index: 10; width: 280px; margin: 0; padding: 8px; list-style: none; background: #fff; border: 1px solid #e3e3f0; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); }
+.ad-bell-list li { padding: 10px; border-bottom: 1px solid #eeeef7; font-size: 0.9rem; }
+.ad-bell-list li:last-child { border-bottom: 0; }
