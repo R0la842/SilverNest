@@ -41,3 +41,21 @@
 .ad-bell-list { position: absolute; right: 0; top: 52px; z-index: 10; width: 280px; margin: 0; padding: 8px; list-style: none; background: #fff; border: 1px solid #e3e3f0; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); }
 .ad-bell-list li { padding: 10px; border-bottom: 1px solid #eeeef7; font-size: 0.9rem; }
 .ad-bell-list li:last-child { border-bottom: 0; }
+
+/* Cards and table */
+.ad-card { background: #fff; border: 1px solid #e3e3f0; border-radius: 14px; padding: 20px; }
+.ad-card h2 { margin: 0 0 14px; font-size: 1.2rem; color: #52509a; }
+.ad-card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ad-card-tools { display: flex; align-items: center; gap: 14px; }
+.ad-card-tools select { min-height: 44px; padding: 0 10px; border: 1px solid #c9c9e0; border-radius: 10px; font: inherit; background: #fff; }
+.ad-view-all { color: #52509a; font-weight: 700; }
+.ad-table-wrap { overflow-x: auto; margin-top: 12px; }
+.ad-table { width: 100%; border-collapse: collapse; min-width: 560px; }
+.ad-table th, .ad-table td { text-align: left; padding: 12px 10px; border-bottom: 1px solid #eeeef7; }
+.ad-table th { color: #5d5c80; font-size: 0.85rem; }
+.ad-badge { padding: 4px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+.ad-badge-pending { background: #fff3d6; color: #9a6700; }
+.ad-badge-accepted { background: #e0ecff; color: #1d4ed8; }
+.ad-badge-inprogress { background: #ece6ff; color: #6d28d9; }
+.ad-badge-completed { background: #e5f6e9; color: #1a7f37; }
+.ad-badge-cancelled { background: #fde4e1; color: #b42318; }
