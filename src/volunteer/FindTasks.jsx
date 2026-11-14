@@ -11,6 +11,7 @@ export default function FindTasks({ tasks = [], onClaimTask }) {
   const [category, setCategory] = useState("");
   const [area, setArea] = useState("");
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [taskToClaim, setTaskToClaim] = useState(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -38,10 +39,9 @@ export default function FindTasks({ tasks = [], onClaimTask }) {
     setArea("");
   }
 
-  function claimTask(taskId) {
+  function handleOpenClaimModal(task) {
     setError("");
     setMessage("");
-    const task = tasks.find((item) => item.id === taskId);
 
     if (volunteer.approvalStatus !== "Approved") {
       setError("Your volunteer account must be approved before claiming tasks.");
@@ -69,36 +69,47 @@ export default function FindTasks({ tasks = [], onClaimTask }) {
       return;
     }
 
+    setTaskToClaim(task);
+  }
+
+  function confirmClaim() {
+    if (!taskToClaim) return;
     if (onClaimTask) {
-      onClaimTask(taskId);
+      onClaimTask(taskToClaim.id);
     }
+    setTaskToClaim(null);
     setSelectedTaskId(null);
     setMessage("Request submitted! Please wait for caregiver approval.");
   }
 
   return (
-    <main className="volunteer-find-tasks">
-      <header className="volunteer-page-header">
-        <h1>Find Tasks</h1>
-        <p>Find a way to support a senior in your neighborhood.</p>
-      </header>
+    <section className="senior-box volunteer-find-tasks">
+      <div className="senior-box-heading">
+        <div>
+          <h2>Find Tasks</h2>
+          <p>Find a way to support a senior in your neighborhood.</p>
+        </div>
+      </div>
 
-      <section className="volunteer-filters" aria-label="Search and filter tasks">
-        <label htmlFor="volunteer-search">Search tasks</label>
+      {/* Search & Filters */}
+      <div className="volunteer-filters" aria-label="Search and filter tasks">
         <input
           id="volunteer-search"
           type="search"
+          className="vol-search-input"
           placeholder="Search groceries, walks, or an area..."
           maxLength={50}
           value={search}
           onChange={(event) => setSearch(event.target.value)}
+          aria-label="Search tasks"
         />
 
-        <label htmlFor="volunteer-category">Category</label>
         <select
           id="volunteer-category"
+          className="vol-select"
           value={category}
           onChange={(event) => setCategory(event.target.value)}
+          aria-label="Filter by category"
         >
           <option value="">All categories</option>
           {serviceCategories.map((item) => (
@@ -108,11 +119,12 @@ export default function FindTasks({ tasks = [], onClaimTask }) {
           ))}
         </select>
 
-        <label htmlFor="volunteer-area">Area</label>
         <select
           id="volunteer-area"
+          className="vol-select"
           value={area}
           onChange={(event) => setArea(event.target.value)}
+          aria-label="Filter by area"
         >
           <option value="">All areas</option>
           {areas.map((item) => (
@@ -122,84 +134,167 @@ export default function FindTasks({ tasks = [], onClaimTask }) {
           ))}
         </select>
 
-        <button type="button" onClick={clearFilters}>
+        <button type="button" className="sn-button sn-button-light" onClick={clearFilters}>
           Clear Filters
         </button>
-      </section>
+      </div>
 
-      <p role="status">{message}</p>
+      {message && (
+        <p role="status" className="vol-success-banner">
+          ✓ {message}
+        </p>
+      )}
       {error && (
-        <p role="alert" className="volunteer-error">
+        <p role="alert" className="file-error">
           {error}
         </p>
       )}
-      <p aria-live="polite">{filteredTasks.length} available task(s)</p>
+      <p className="sn-muted" aria-live="polite">
+        {filteredTasks.length} available task(s)
+      </p>
 
       {filteredTasks.length === 0 ? (
-        <section className="volunteer-empty-state">
-          <h2>No tasks found</h2>
-          <p>Try another keyword, category, or area.</p>
-          <button type="button" onClick={clearFilters}>
+        <div className="volunteer-empty-state">
+          <h3>No tasks found</h3>
+          <p className="sn-empty-note">Try another keyword, category, or area.</p>
+          <button type="button" className="sn-button sn-button-light" onClick={clearFilters}>
             Clear Filters
           </button>
-        </section>
+        </div>
       ) : (
-        <div className="volunteer-task-grid">
+        <div className="sn-request-list">
           {filteredTasks.map((task) => (
-            <article key={task.id} className="volunteer-task-card">
-              <p className="volunteer-task-category">{task.category}</p>
-              <h2>{task.title}</h2>
-              <p>{task.description}</p>
-              <p>
-                {task.area} · {task.distanceKm} km away (sample distance)
-              </p>
-              <p>
-                <time dateTime={task.date}>{task.date}</time>
-              </p>
-              <p>
-                {task.startTime}–{task.endTime} (Saudi time)
-              </p>
-              <p>Estimated time: {task.estimatedHours} hour(s)</p>
-              <button
-                type="button"
-                aria-expanded={selectedTaskId === task.id}
-                aria-controls={
-                  selectedTaskId === task.id ? "volunteer-task-details" : undefined
-                }
-                onClick={() => {
-                  setSelectedTaskId(selectedTaskId === task.id ? null : task.id);
-                  setError("");
-                  setMessage("");
-                }}
-              >
-                {selectedTaskId === task.id ? "Hide Details" : "View Details"}
-              </button>
+            <article key={task.id} className="sn-request-card">
+              <div className="sn-request-symbol">
+                {task.category === "Accompanied walks" ? "♡" : "⌁"}
+              </div>
+              <div className="sn-request-body">
+                <div className="sn-request-top">
+                  <div>
+                    <h3>{task.title}</h3>
+                    <span className="sn-category">
+                      {task.id} · {task.category}
+                    </span>
+                  </div>
+                  <span className="sn-status green">
+                    <i />
+                    {task.status}
+                  </span>
+                </div>
 
-              {selectedTaskId === task.id && selectedTask && (
-                <section
-                  id="volunteer-task-details"
-                  className="volunteer-task-details"
-                  aria-label={`Details for ${task.title}`}
-                >
-                  <h3>Task Details</h3>
-                  <p>Reference: {task.id}</p>
-                  <p>{task.notes}</p>
-                  <p>
-                    Completion photo: {task.proofRequired ? "Required" : "Not required"}
-                  </p>
-                  <p>
-                    The senior's name and exact address are hidden until caregiver approval.
-                  </p>
-                  <p>SilverNest offers non-medical assistance only.</p>
-                  <button type="button" onClick={() => claimTask(task.id)}>
+                <div className="sn-request-meta">
+                  <span>▣ {task.date}</span>
+                  <span>
+                    ◷ {task.startTime}–{task.endTime}
+                  </span>
+                  <span>
+                    ⌖ {task.area} · {task.distanceKm} km away
+                  </span>
+                  <span>⏱ {task.estimatedHours} hr(s)</span>
+                </div>
+
+                <p className="sn-request-details">{task.description}</p>
+
+                <div className="sn-request-actions">
+                  <button
+                    type="button"
+                    aria-expanded={selectedTaskId === task.id}
+                    onClick={() => {
+                      setSelectedTaskId(selectedTaskId === task.id ? null : task.id);
+                      setError("");
+                      setMessage("");
+                    }}
+                  >
+                    {selectedTaskId === task.id ? "Hide Details" : "View Details"}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="vol-claim-inline-btn"
+                    onClick={() => handleOpenClaimModal(task)}
+                  >
                     Claim Task
                   </button>
-                </section>
-              )}
+                </div>
+
+                {selectedTaskId === task.id && selectedTask && (
+                  <section
+                    className="volunteer-task-details"
+                    aria-label={`Details for ${task.title}`}
+                  >
+                    <h4>Task Details</h4>
+                    <p>
+                      <strong>Notes:</strong> {task.notes}
+                    </p>
+                    <p>
+                      <strong>Completion photo:</strong>{" "}
+                      {task.proofRequired ? "Required" : "Not required"}
+                    </p>
+                    <p className="vol-privacy-note">
+                      🔒 The senior's name and exact address are hidden until caregiver approval.
+                    </p>
+                    <p className="sn-muted">SilverNest offers non-medical assistance only.</p>
+                  </section>
+                )}
+              </div>
             </article>
           ))}
         </div>
       )}
-    </main>
+
+      {/* Claim Confirmation Modal */}
+      {taskToClaim && (
+        <div
+          className="sn-overlay"
+          onMouseDown={(e) => e.target === e.currentTarget && setTaskToClaim(null)}
+        >
+          <section className="sn-modal" role="dialog" aria-modal="true" aria-labelledby="claim-title">
+            <button
+              className="sn-close"
+              onClick={() => setTaskToClaim(null)}
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <p className="sn-eyebrow">CONFIRM CLAIM</p>
+            <h2 id="claim-title">Claim this task?</h2>
+            <p className="sn-muted">
+              Request <strong>{taskToClaim.id} - {taskToClaim.title}</strong>. You will be
+              assigned once the family caregiver approves.
+            </p>
+
+            <div className="vol-claim-summary">
+              <p>
+                <strong>Task details:</strong> {taskToClaim.description}
+              </p>
+              <p>
+                <strong>Schedule:</strong> {taskToClaim.date}, {taskToClaim.startTime}–
+                {taskToClaim.endTime}
+              </p>
+              <p>
+                <strong>Area:</strong> {taskToClaim.area} · {taskToClaim.distanceKm} km away
+              </p>
+            </div>
+
+            <div className="sn-modal-actions">
+              <button
+                type="button"
+                className="sn-button sn-button-light"
+                onClick={() => setTaskToClaim(null)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="sn-button sn-button-primary"
+                onClick={confirmClaim}
+              >
+                Confirm Claim
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+    </section>
   );
 }
