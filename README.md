@@ -82,8 +82,8 @@ Email activation and volunteer document submission are simulated front-end inter
 
 - Rola Alshahrani – Landing Page, Sign Up, Login, Services, Service Details, and Footer Pages.
 - Rimas Binotay – Senior and Caregiver Features, including dashboards, assistance requests, daily wellness check-ins, caregiver-senior linking, volunteer approvals and rejections, notifications, messaging, profile and settings pages, and responsive design.
-- Alanoud Hazazi – 
-- Sidrah Sanaullah – 
+- Alanoud Hazazi – Volunteer dashboard, browse/search.filter tasks, task details, claim a task, view assigned tasks, enter completion notes, upload proof if needed, view service hours and feedback
+- Sidrah Sanaullah – Admin Dashboard, manage user accounts, verify volunteers, manage and monitor requests, review reported issues, monitor volunteer performance, view statistics, manage settings, and integrate the pages and shared navigation
 
 ## Project Status
 
