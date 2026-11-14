@@ -3,6 +3,7 @@ import { Route, Routes, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useEffect } from 'react';
 import { useState } from 'react';
 import MemberFeatures from './MemberFeatures.jsx';
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 function Navbar() {
   return (
     <nav className="navbar">
@@ -823,6 +824,7 @@ function App() {
         <Route path="/safety" element={<Safety />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<Terms />} />
+        <Route path="/admin" element={<AdminDashboard />} />
 
 
       </Routes>
