@@ -75,7 +75,7 @@ Email activation and volunteer document submission are simulated front-end inter
 ## Team Members and Roles
 
 - Rola Alshahrani – Landing Page, Sign Up, Login, Services, Service Details, and Footer Pages.
-- Rimas Binotay – 
+- Rimas Binotay – Senior and Caregiver Features, including dashboards, assistance requests, daily wellness check-ins, caregiver-senior linking, volunteer approvals and rejections, notifications, messaging, profile and settings pages, and responsive design.
 - Alanoud Hazazi – 
 - Sidrah Sanaullah – 
 
