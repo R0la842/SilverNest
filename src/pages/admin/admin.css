@@ -1,0 +1,25 @@
+.ad-shell { display: flex; min-height: 100vh; background: #f6f6fb; color: #2b2a4c; }
+.ad-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.ad-main { flex: 1; min-width: 0; }
+
+/* Sidebar */
+.ad-sidebar { width: 240px; flex-shrink: 0; background: #52509a; color: #fff; padding: 24px 16px; display: flex; flex-direction: column; gap: 8px; }
+.ad-brand { color: #fff; font-size: 1.5rem; font-weight: 700; text-decoration: none; }
+.ad-workspace { font-size: 0.85rem; opacity: 0.8; margin: 0 0 16px; }
+.ad-nav { display: flex; flex-direction: column; gap: 6px; }
+.ad-link { display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 10px; color: #fff; text-decoration: none; font-size: 1rem; }
+.ad-link:hover { background: rgba(255, 255, 255, 0.15); }
+.ad-link.active { background: #fff; color: #52509a; font-weight: 700; }
+.ad-logout { margin-top: auto; }
+.ad-menu-btn { display: none; min-height: 48px; margin: 12px 16px 0; padding: 0 16px; border: 0; border-radius: 10px; background: #52509a; color: #fff; font-size: 1rem; cursor: pointer; }
+.ad-link:focus-visible, .ad-menu-btn:focus-visible { outline: 3px solid #f5a524; outline-offset: 2px; }
+
+/* Content and da stat cards */
+.ad-content { padding: 32px; max-width: 1200px; }
+.ad-content h1 { margin: 0 0 4px; font-size: 2rem; color: #52509a; }
+.ad-subtitle { margin: 0 0 24px; color: #5d5c80; }
+.ad-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+.ad-stat { background: #fff; border: 1px solid #e3e3f0; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 4px; }
+.ad-stat strong { font-size: 2rem; color: #52509a; }
+.ad-stat span { color: #5d5c80; }
+
