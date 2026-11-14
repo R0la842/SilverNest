@@ -63,6 +63,14 @@ Volunteers can provide their information and select a document for the vetting p
 
 The application includes role-based dashboard interfaces for managing and monitoring relevant activities.
 
+### Admin Demo
+
+Start the application using the steps above. From the landing page, click **Admin Demo** to open the admin dashboard.
+
+You can also go directly to `/admin` after the local address shown in the terminal, for example: `http://localhost:5173/admin`.
+
+Use the admin navigation menu to view user accounts, volunteers, requests, reported issues, statistics, and settings. This prototype uses sample data.
+
 ### Additional Pages
 
 Users can access About, Contact, Safety, Privacy Policy, and Terms of Service pages through the footer.
@@ -72,13 +80,6 @@ Users can access About, Contact, Safety, Privacy Policy, and Terms of Service pa
 No additional API keys or environment variables are required for the current front-end prototype.
 Email activation and volunteer document submission are simulated front-end interactions and do not require external services.
 
-### Admin Demo
-
-Start the application using the steps above. From the landing page, click **Admin Demo** to open the admin dashboard.
-
-You can also go directly to `/admin` after the local address shown in the terminal, for example: `http://localhost:5173/admin`.
-
-Use the admin navigation menu to view user accounts, volunteers, requests, reported issues, statistics, and settings. This prototype uses sample data.
 
 
 ## Team Members and Roles
