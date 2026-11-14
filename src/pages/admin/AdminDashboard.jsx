@@ -1,7 +1,42 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout.jsx';
-import { stats, statusCounts, recentRequests } from '../../data/adminData.js';
+import { stats, weeklyActivity, statusCounts, recentRequests } from '../../data/adminData.js';
+
+function ActivityChart() {
+  const width = 420;
+  const height = 170;
+  const pad = 24;
+  const max = Math.max(1,...weeklyActivity.map((d) => d.value));
+  const step = (width - pad * 2) / (weeklyActivity.length - 1);
+  const points = weeklyActivity.map((d, i) => ({
+    x: pad + i * step,
+    y: height - pad - (d.value / max) * (height - pad * 2),
+    ...d,
+  }));
+  const line = points.map((p) => `${p.x},${p.y}`).join(' ');
+
+  return (
+    <section className="ad-card">
+      <h2>Request Activity (Last 7 days)</h2>
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="ad-chart"
+        role="img"
+        aria-label="Requests per day over the last 7 days"
+      >
+        <polyline points={line} fill="none" stroke="#52509a" strokeWidth="3" />
+        {points.map((p) => (
+          <g key={p.day}>
+            <circle cx={p.x} cy={p.y} r="5" fill="#52509a" />
+            <text x={p.x} y={height - 4} textAnchor="middle" fontSize="11" fill="#5d5c80">{p.day}</text>
+            <text x={p.x} y={p.y - 10} textAnchor="middle" fontSize="11" fill="#2b2a4c">{p.value}</text>
+          </g>
+        ))}
+      </svg>
+    </section>
+  );
+}
 
 export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState('All');
@@ -25,7 +60,10 @@ export default function AdminDashboard() {
           ))}
         </section>
 
-        {/* charts go here */}
+        {<div className="ad-grid">
+          <ActivityChart />
+          {/* donut goes here */}
+        </div>}
 
         {<section className="ad-card">
           <div className="ad-card-head">

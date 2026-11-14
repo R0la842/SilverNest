@@ -59,3 +59,13 @@
 .ad-badge-inprogress { background: #ece6ff; color: #6d28d9; }
 .ad-badge-completed { background: #e5f6e9; color: #1a7f37; }
 .ad-badge-cancelled { background: #fde4e1; color: #b42318; }
+
+/* Charts */
+.ad-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-bottom: 20px; }
+.ad-chart { width: 100%; height: auto; }
+
+@media (max-width: 768px) {
+  .ad-grid {
+    grid-template-columns: 1fr;
+  }
+}

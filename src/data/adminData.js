@@ -29,3 +29,14 @@ export const recentRequests = [
   { id: '#R5', task: 'Grocery Shopping', volunteer: 'Unassigned', date: '08 Oct 2026', status: 'Pending' },
   { id: '#R6', task: 'Pharmacy Pickup', volunteer: 'Sarah Chen', date: '08 Oct 2026', status: 'Cancelled' },
 ];
+
+
+export const weeklyActivity = [
+  { day: 'Sat', value: 4 },
+  { day: 'Sun', value: 7 },
+  { day: 'Mon', value: 5 },
+  { day: 'Tue', value: 9 },
+  { day: 'Wed', value: 8 },
+  { day: 'Thu', value: 11 },
+  { day: 'Fri', value: 6 },
+];
