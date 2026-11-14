@@ -1,17 +1,12 @@
 import { useState } from "react";
 import {
-  initialTasks,
   volunteer,
   serviceCategories,
   TASK_STATUS,
 } from "./volunteerData";
 import "./Volunteer.css";
 
-// Starter: search, filters, details, and claiming work with local demo state.
-// Later, move tasks/setTasks to the parent shared with MyTasks and Dashboard.
-// State resets when this component unmounts or the page reloads.
-export default function FindTasks() {
-  const [tasks, setTasks] = useState(initialTasks);
+export default function FindTasks({ tasks = [], onClaimTask }) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [area, setArea] = useState("");
@@ -58,14 +53,15 @@ export default function FindTasks() {
       return;
     }
 
-    // HH:mm strings can be compared because times use a zero-padded 24h format.
-    const hasOverlap = tasks.some((other) =>
-      other.volunteerId === volunteer.id &&
-      [TASK_STATUS.REQUESTED, TASK_STATUS.ASSIGNED, TASK_STATUS.IN_PROGRESS]
-        .includes(other.status) &&
-      other.date === task.date &&
-      other.startTime < task.endTime &&
-      task.startTime < other.endTime
+    const hasOverlap = tasks.some(
+      (other) =>
+        other.volunteerId === volunteer.id &&
+        [TASK_STATUS.REQUESTED, TASK_STATUS.ASSIGNED, TASK_STATUS.IN_PROGRESS].includes(
+          other.status
+        ) &&
+        other.date === task.date &&
+        other.startTime < task.endTime &&
+        task.startTime < other.endTime
     );
 
     if (hasOverlap) {
@@ -73,16 +69,9 @@ export default function FindTasks() {
       return;
     }
 
-    setTasks((previous) => previous.map((item) =>
-      item.id === taskId
-        ? {
-            ...item,
-            status: TASK_STATUS.REQUESTED,
-            volunteerId: volunteer.id,
-            requestedAt: new Date().toISOString(),
-          }
-        : item
-    ));
+    if (onClaimTask) {
+      onClaimTask(taskId);
+    }
     setSelectedTaskId(null);
     setMessage("Request submitted! Please wait for caregiver approval.");
   }
@@ -106,35 +95,53 @@ export default function FindTasks() {
         />
 
         <label htmlFor="volunteer-category">Category</label>
-        <select id="volunteer-category" value={category}
-          onChange={(event) => setCategory(event.target.value)}>
+        <select
+          id="volunteer-category"
+          value={category}
+          onChange={(event) => setCategory(event.target.value)}
+        >
           <option value="">All categories</option>
           {serviceCategories.map((item) => (
-            <option key={item} value={item}>{item}</option>
+            <option key={item} value={item}>
+              {item}
+            </option>
           ))}
         </select>
 
         <label htmlFor="volunteer-area">Area</label>
-        <select id="volunteer-area" value={area}
-          onChange={(event) => setArea(event.target.value)}>
+        <select
+          id="volunteer-area"
+          value={area}
+          onChange={(event) => setArea(event.target.value)}
+        >
           <option value="">All areas</option>
           {areas.map((item) => (
-            <option key={item} value={item}>{item}</option>
+            <option key={item} value={item}>
+              {item}
+            </option>
           ))}
         </select>
 
-        <button type="button" onClick={clearFilters}>Clear Filters</button>
+        <button type="button" onClick={clearFilters}>
+          Clear Filters
+        </button>
       </section>
 
       <p role="status">{message}</p>
-      {error && <p role="alert" className="volunteer-error">{error}</p>}
+      {error && (
+        <p role="alert" className="volunteer-error">
+          {error}
+        </p>
+      )}
       <p aria-live="polite">{filteredTasks.length} available task(s)</p>
 
       {filteredTasks.length === 0 ? (
         <section className="volunteer-empty-state">
           <h2>No tasks found</h2>
           <p>Try another keyword, category, or area.</p>
-          <button type="button" onClick={clearFilters}>Clear Filters</button>
+          <button type="button" onClick={clearFilters}>
+            Clear Filters
+          </button>
         </section>
       ) : (
         <div className="volunteer-task-grid">
@@ -143,29 +150,46 @@ export default function FindTasks() {
               <p className="volunteer-task-category">{task.category}</p>
               <h2>{task.title}</h2>
               <p>{task.description}</p>
-              <p>{task.area} · {task.distanceKm} km away (sample distance)</p>
-              <p><time dateTime={task.date}>{task.date}</time></p>
-              <p>{task.startTime}–{task.endTime} (Saudi time)</p>
+              <p>
+                {task.area} · {task.distanceKm} km away (sample distance)
+              </p>
+              <p>
+                <time dateTime={task.date}>{task.date}</time>
+              </p>
+              <p>
+                {task.startTime}–{task.endTime} (Saudi time)
+              </p>
               <p>Estimated time: {task.estimatedHours} hour(s)</p>
-              <button type="button"
+              <button
+                type="button"
                 aria-expanded={selectedTaskId === task.id}
-                aria-controls={selectedTaskId === task.id ? "volunteer-task-details" : undefined}
+                aria-controls={
+                  selectedTaskId === task.id ? "volunteer-task-details" : undefined
+                }
                 onClick={() => {
                   setSelectedTaskId(selectedTaskId === task.id ? null : task.id);
                   setError("");
                   setMessage("");
-                }}>
+                }}
+              >
                 {selectedTaskId === task.id ? "Hide Details" : "View Details"}
               </button>
 
               {selectedTaskId === task.id && selectedTask && (
-                <section id="volunteer-task-details" className="volunteer-task-details"
-                  aria-label={`Details for ${task.title}`}>
+                <section
+                  id="volunteer-task-details"
+                  className="volunteer-task-details"
+                  aria-label={`Details for ${task.title}`}
+                >
                   <h3>Task Details</h3>
                   <p>Reference: {task.id}</p>
                   <p>{task.notes}</p>
-                  <p>Completion photo: {task.proofRequired ? "Required" : "Not required"}</p>
-                  <p>The senior's name and exact address are hidden until caregiver approval.</p>
+                  <p>
+                    Completion photo: {task.proofRequired ? "Required" : "Not required"}
+                  </p>
+                  <p>
+                    The senior's name and exact address are hidden until caregiver approval.
+                  </p>
                   <p>SilverNest offers non-medical assistance only.</p>
                   <button type="button" onClick={() => claimTask(task.id)}>
                     Claim Task
